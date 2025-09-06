@@ -1,0 +1,878 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teachers Best Friend</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        // Configure Tailwind CSS to use the 'class' strategy for dark mode
+        tailwind.config = {
+            darkMode: 'class',
+        }
+    </script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        /* Seating Chart Specific Styles */
+        .draggable {
+            position: absolute;
+            transition: box-shadow 0.2s ease-in-out;
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+            cursor: grab;
+            touch-action: none;
+        }
+        .dark .draggable {
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.3), 0 1px 2px 0 rgba(0, 0, 0, 0.2);
+        }
+        .draggable:active {
+            cursor: grabbing;
+            z-index: 1000;
+        }
+        .draggable:hover {
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+        .dark .draggable:hover {
+             box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.4), 0 2px 4px -1px rgba(0, 0, 0, 0.3);
+        }
+        .desk {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            width: 100px;
+            height: 60px;
+        }
+        .desk.double {
+             width: 200px;
+             height: 60px;
+             flex-direction: row;
+        }
+        .desk-name {
+            font-size: 0.8rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            height: 100%;
+            text-align: center;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            padding: 0 2px;
+        }
+        .desk.double > .desk-name { width: 50%; }
+        .room-component {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+        .door { width: 100px; height: 20px; }
+        .whiteboard { width: 240px; height: 20px; }
+        .smartboard { width: 200px; height: 20px; }
+        #canvas-container {
+            position: relative;
+            overflow: hidden;
+            background-size: 20px 20px;
+            transition: background-image 0.3s ease-in-out;
+        }
+        .rotate-handle {
+            position: absolute;
+            bottom: -25px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 20px;
+            height: 20px;
+            border-radius: 9999px;
+            cursor: alias;
+            z-index: 10;
+            opacity: 0;
+            transition: opacity 0.2s ease-in-out;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .delete-btn, .align-btn {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            border-radius: 9999px;
+            cursor: pointer;
+            z-index: 10;
+            opacity: 0;
+            transition: opacity 0.2s ease-in-out;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .delete-btn { top: 3px; right: 3px; }
+        .align-btn { top: 3px; left: 3px; }
+        .draggable:hover .rotate-handle, .draggable:hover .delete-btn, .draggable:hover .align-btn {
+            opacity: 1;
+        }
+
+        /* General Styles */
+        .nav-btn.active {
+            background-color: #C53030; /* red-700 */
+            color: white;
+        }
+        .page {
+            display: none;
+        }
+        .page.active {
+            display: block;
+        }
+        .modal {
+            position: fixed;
+            inset: 0;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 50;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .modal.hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 dark:bg-gray-900 text-gray-800 dark:text-gray-200 flex flex-col items-center min-h-screen p-4 transition-colors duration-300">
+
+    <div class="w-full max-w-6xl mx-auto bg-white dark:bg-gray-800 rounded-xl shadow-lg relative transition-colors duration-300">
+        <!-- Header & Navigation -->
+        <header class="flex justify-between items-center p-4 md:p-6 border-b border-gray-200 dark:border-gray-700">
+            <div class="flex items-center space-x-2">
+                 <svg class="h-8 w-8 text-red-700" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 3v11.25A2.25 2.25 0 006 16.5h12M3.75 3h16.5M3.75 3v11.25A2.25 2.25 0 006 16.5h12M3.75 12h16.5m-16.5 4.5h16.5m-16.5 4.5h16.5M12 6.75h.008v.008H12V6.75z" />
+                </svg>
+                <h1 class="text-xl md:text-2xl font-bold text-gray-800 dark:text-gray-100">Teachers Best Friend</h1>
+            </div>
+            <div class="flex items-center space-x-2 bg-gray-100 dark:bg-gray-900 p-1 rounded-lg">
+                <button id="navSeatingChart" class="nav-btn px-3 py-1.5 text-sm font-semibold rounded-md transition">Seating Chart</button>
+                <button id="navGroupGenerator" class="nav-btn px-3 py-1.5 text-sm font-semibold rounded-md transition">Group Generator</button>
+            </div>
+            <div class="flex items-center space-x-1">
+                <button id="themeToggleBtn" class="p-2 rounded-full text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none">
+                    <svg id="theme-icon-light" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" /></svg>
+                    <svg id="theme-icon-dark" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" /></svg>
+                </button>
+                <button id="helpBtn" class="p-2 rounded-full text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none" title="Help">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                </button>
+            </div>
+        </header>
+
+        <main class="p-6 md:p-8">
+            <!-- Seating Chart Page -->
+            <div id="page-seating-chart" class="page">
+                <header class="text-center mb-8">
+                    <h1 class="text-3xl md:text-4xl font-bold text-gray-800 dark:text-gray-100">Seating Chart Generator</h1>
+                    <p class="text-gray-500 dark:text-gray-400 mt-2">Create, save, and load layouts to randomly assign seats.</p>
+                </header>
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                    <div class="lg:col-span-1 bg-gray-50 dark:bg-gray-700/50 p-6 rounded-lg border border-gray-200 dark:border-gray-600">
+                        <h2 class="text-xl font-semibold mb-4 border-b pb-2 border-gray-200 dark:border-gray-600">Controls</h2>
+                        <div class="mb-6">
+                            <h3 class="font-medium text-gray-700 dark:text-gray-300 mb-2">1. Add Desks</h3>
+                            <p class="text-sm text-gray-500 dark:text-gray-400 mb-2">Click icons on desks to align, delete, or rotate (snaps to 15°).</p>
+                            <div class="flex flex-col space-y-2">
+                                 <button id="singleDeskBtn" class="w-full bg-red-700 text-white font-semibold py-2 px-4 rounded-md transition hover:bg-red-800">Add Single Desk</button>
+                                 <button id="doubleDeskBtn" class="w-full bg-red-700 text-white font-semibold py-2 px-4 rounded-md transition hover:bg-red-800">Add Double Desk</button>
+                            </div>
+                        </div>
+                        <div class="mb-6">
+                            <h3 class="font-medium text-gray-700 dark:text-gray-300 mb-2">2. Add Room Components</h3>
+                            <div class="flex space-x-2">
+                                <select id="roomComponentSelect" class="block w-full rounded-md border-gray-300 dark:border-gray-500 bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-200 shadow-sm focus:border-red-500 focus:ring-red-500 sm:text-sm">
+                                    <option value="door">Door</option>
+                                    <option value="whiteboard">Whiteboard</option>
+                                    <option value="smartboard">Smartboard</option>
+                                </select>
+                                <button id="addComponentBtn" class="bg-gray-500 text-white font-semibold py-2 px-4 rounded-md transition hover:bg-gray-600 flex-shrink-0">Add</button>
+                            </div>
+                        </div>
+                        <div class="mb-6">
+                             <div class="flex justify-between items-center mb-2">
+                                <h3 class="font-medium text-gray-700 dark:text-gray-300">3. Enter Names</h3>
+                                <label for="csvFileInput" class="text-sm bg-gray-200 hover:bg-gray-300 text-gray-700 dark:bg-gray-600 dark:hover:bg-gray-500 dark:text-gray-200 font-semibold py-1 px-3 rounded-md cursor-pointer transition">Upload CSV</label>
+                                <input type="file" id="csvFileInput" class="hidden" accept=".csv">
+                            </div>
+                            <textarea id="names" rows="6" class="block w-full rounded-md border-gray-300 dark:border-gray-500 bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-200 dark:placeholder-gray-400 shadow-sm focus:border-red-500 focus:ring-red-500 sm:text-sm" placeholder="Enter names, one per line..."></textarea>
+                        </div>
+                        <div class="mb-6">
+                            <h3 class="font-medium text-gray-700 dark:text-gray-300 mb-2">4. Layout Management</h3>
+                            <div class="flex space-x-2 mb-2">
+                                <input type="text" id="layoutName" class="block w-full rounded-md border-gray-300 dark:border-gray-500 bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-200 dark:placeholder-gray-400 shadow-sm focus:border-red-500 focus:ring-red-500 sm:text-sm" placeholder="Layout Name">
+                                <button id="saveLayoutBtn" class="bg-gray-800 dark:bg-gray-200 text-white dark:text-gray-800 font-semibold py-2 px-4 rounded-md hover:bg-black dark:hover:bg-white transition">Save</button>
+                            </div>
+                            <div class="flex space-x-2">
+                                <select id="layoutsDropdown" class="block w-full rounded-md border-gray-300 dark:border-gray-500 bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-200 shadow-sm focus:border-red-500 focus:ring-red-500 sm:text-sm"><option value="">-- Select a Layout --</option></select>
+                                <button id="loadLayoutBtn" class="bg-gray-600 text-white p-2 rounded-md hover:bg-gray-700 transition flex-shrink-0" title="Load Layout"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M3.5 6a.5.5 0 0 0-.5.5v8a.5.5 0 0 0 .5.5h9a.5.5 0 0 0 .5-.5v-8a.5.5 0 0 0-.5-.5h-2a.5.5 0 0 1 0-1h2A1.5 1.5 0 0 1 14 6.5v8A1.5 1.5 0 0 1 12.5 16h-9A1.5 1.5 0 0 1 2 14.5v-8A1.5 1.5 0 0 1 3.5 5h2a.5.5 0 0 1 0 1z"/><path fill-rule="evenodd" d="M7.646 11.854a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 10.293V1.5a.5.5 0 0 0-1 0v8.793L6.354 9.146a.5.5 0 1 0-.708.708z"/></svg></button>
+                                <button id="deleteLayoutBtn" class="bg-red-600 text-white p-2 rounded-md hover:bg-red-700 transition flex-shrink-0" title="Delete Layout"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16"><path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0z"/><path d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4zM2.5 3h11V2h-11z"/></svg></button>
+                            </div>
+                        </div>
+                        <div>
+                             <h3 class="font-medium text-gray-700 dark:text-gray-300 mb-2">5. Assign & Manage</h3>
+                            <button id="assignNamesBtn" class="w-full bg-green-600 text-white font-semibold py-2 px-4 rounded-md hover:bg-green-700 transition mb-2">Assign Names</button>
+                            <button id="clearNamesBtn" class="w-full bg-yellow-500 text-white font-semibold py-2 px-4 rounded-md hover:bg-yellow-600 transition mb-2">Clear Names</button>
+                            <button id="resetCanvasBtn" class="w-full bg-red-600 text-white font-semibold py-2 px-4 rounded-md hover:bg-red-700 transition">Reset Canvas</button>
+                        </div>
+                    </div>
+                    <div id="canvas-container" class="lg:col-span-2 bg-gray-50 dark:bg-gray-900/50 p-2 rounded-lg border border-gray-200 dark:border-gray-600 flex items-center justify-center min-h-[400px] lg:min-h-[500px]">
+                         <p class="text-gray-400 dark:text-gray-500">Add desks to get started.</p>
+                    </div>
+                </div>
+                <div id="seating-chart-message-box" class="mt-6 text-center text-sm font-medium h-5"></div>
+            </div>
+
+            <!-- Group Generator Page -->
+            <div id="page-group-generator" class="page">
+                <header class="text-center mb-8">
+                    <h1 class="text-3xl md:text-4xl font-bold text-gray-800 dark:text-gray-100">Random Group Generator</h1>
+                    <p class="text-gray-500 dark:text-gray-400 mt-2">Randomly assign students into groups.</p>
+                </header>
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                    <div class="lg:col-span-1 bg-gray-50 dark:bg-gray-700/50 p-6 rounded-lg border border-gray-200 dark:border-gray-600">
+                        <h2 class="text-xl font-semibold mb-4 border-b pb-2 border-gray-200 dark:border-gray-600">Configuration</h2>
+                        <div class="mb-6">
+                            <div class="flex justify-between items-center mb-2">
+                               <h3 class="font-medium text-gray-700 dark:text-gray-300">1. Enter Names</h3>
+                               <label for="groupCsvFileInput" class="text-sm bg-gray-200 hover:bg-gray-300 text-gray-700 dark:bg-gray-600 dark:hover:bg-gray-500 dark:text-gray-200 font-semibold py-1 px-3 rounded-md cursor-pointer transition">Upload CSV</label>
+                               <input type="file" id="groupCsvFileInput" class="hidden" accept=".csv">
+                           </div>
+                           <textarea id="groupNames" rows="10" class="block w-full rounded-md border-gray-300 dark:border-gray-500 bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-200 dark:placeholder-gray-400 shadow-sm focus:border-red-500 focus:ring-red-500 sm:text-sm" placeholder="Enter names, one per line..."></textarea>
+                        </div>
+                        <div class="mb-6">
+                            <h3 class="font-medium text-gray-700 dark:text-gray-300 mb-2">2. Set Number of Groups</h3>
+                            <input type="number" id="numGroups" min="1" value="2" class="block w-full rounded-md border-gray-300 dark:border-gray-500 bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-200 dark:placeholder-gray-400 shadow-sm focus:border-red-500 focus:ring-red-500 sm:text-sm">
+                        </div>
+                        <div>
+                             <h3 class="font-medium text-gray-700 dark:text-gray-300 mb-2">3. Generate</h3>
+                            <button id="generateGroupsBtn" class="w-full bg-green-600 text-white font-semibold py-2 px-4 rounded-md hover:bg-green-700 transition">Generate Groups</button>
+                        </div>
+                    </div>
+                    <div class="lg:col-span-2 p-2 min-h-[400px] lg:min-h-[500px]">
+                        <h2 class="text-xl font-semibold mb-4 text-center">Generated Groups</h2>
+                        <div id="groupsResultContainer" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+                            <p class="text-gray-400 dark:text-gray-500 col-span-full text-center mt-8">Groups will appear here once generated.</p>
+                        </div>
+                    </div>
+                </div>
+                 <div id="group-generator-message-box" class="mt-6 text-center text-sm font-medium h-5"></div>
+            </div>
+        </main>
+    </div>
+    
+    <!-- Help Modal -->
+    <div id="helpModal" class="modal hidden">
+        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-xl w-full max-w-2xl m-4 transform transition-all">
+            <div class="flex justify-between items-center p-4 border-b border-gray-200 dark:border-gray-700">
+                <h2 class="text-xl font-bold text-gray-800 dark:text-gray-100 flex items-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-2 text-red-700" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                    Help & Tips
+                </h2>
+                <button id="closeHelpModalBtn" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 text-2xl font-bold">&times;</button>
+            </div>
+            <div class="p-6 space-y-6 max-h-[70vh] overflow-y-auto">
+                <div>
+                    <h3 class="font-semibold text-lg mb-2 text-gray-800 dark:text-gray-200 border-b border-gray-200 dark:border-gray-600 pb-2">Seating Chart Generator</h3>
+                    <ul class="list-disc list-inside space-y-2 text-gray-600 dark:text-gray-400">
+                        <li><strong>Adding Items:</strong> Use the buttons in the control panel to add desks and room components to the canvas.</li>
+                        <li><strong>Moving Items:</strong> Click and drag any item to move it around the canvas. It will automatically snap to the grid.</li>
+                        <li><strong>Item Controls:</strong> Hover over any item to reveal its controls:
+                            <ul class="list-disc list-inside ml-6 mt-1">
+                                <li><strong class="text-blue-600 dark:text-blue-400">Magnet Icon:</strong> Snaps the item perfectly to the nearest grid line.</li>
+                                <li><strong class="text-red-600 dark:text-red-400">X Icon:</strong> Deletes the item from the canvas.</li>
+                                <li><strong>Rotate Handle:</strong> Click and drag the handle below the item to rotate it in 15-degree increments.</li>
+                            </ul>
+                        </li>
+                        <li><strong>Saving/Loading:</strong> Name your layout, click "Save", and it will appear in the dropdown. You can load or delete saved layouts at any time. Your layouts are saved in your browser.</li>
+                        <li><strong>Importing Names:</strong> Click "Upload CSV" to quickly import a list of names from a CSV file. The file should contain names separated by commas or new lines.</li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 class="font-semibold text-lg mb-2 text-gray-800 dark:text-gray-200 border-b border-gray-200 dark:border-gray-600 pb-2">Random Group Generator</h3>
+                    <ul class="list-disc list-inside space-y-2 text-gray-600 dark:text-gray-400">
+                        <li><strong>Enter Names:</strong> Type or paste names into the text area, one name per line. You can also use the "Upload CSV" button.</li>
+                        <li><strong>Set Group Count:</strong> Enter the total number of groups you want to create.</li>
+                        <li><strong>Generate:</strong> Click "Generate Groups" to randomly and evenly distribute the names into the specified number of groups.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <script>
+        // --- THEME & NAVIGATION ---
+        const themeToggleBtn = document.getElementById('themeToggleBtn');
+        const themeIconLight = document.getElementById('theme-icon-light');
+        const themeIconDark = document.getElementById('theme-icon-dark');
+        const navSeatingChart = document.getElementById('navSeatingChart');
+        const navGroupGenerator = document.getElementById('navGroupGenerator');
+        const pageSeatingChart = document.getElementById('page-seating-chart');
+        const pageGroupGenerator = document.getElementById('page-group-generator');
+        const helpBtn = document.getElementById('helpBtn');
+        const helpModal = document.getElementById('helpModal');
+        const closeHelpModalBtn = document.getElementById('closeHelpModalBtn');
+        
+        function applyTheme(theme) {
+            const chartContainer = document.getElementById('canvas-container');
+            if (theme === 'dark') {
+                document.documentElement.classList.add('dark');
+                themeIconLight.classList.remove('hidden');
+                themeIconDark.classList.add('hidden');
+                if (chartContainer) chartContainer.style.backgroundImage = `linear-gradient(rgba(255, 255, 255, 0.07) 1px, transparent 1px), linear-gradient(90deg, rgba(255, 255, 255, 0.07) 1px, transparent 1px)`;
+            } else {
+                document.documentElement.classList.remove('dark');
+                themeIconLight.classList.add('hidden');
+                themeIconDark.classList.remove('hidden');
+                if (chartContainer) chartContainer.style.backgroundImage = `linear-gradient(rgba(0, 0, 0, 0.05) 1px, transparent 1px), linear-gradient(90deg, rgba(0, 0, 0, 0.05) 1px, transparent 1px)`;
+            }
+        }
+
+        function switchPage(page) {
+            pageSeatingChart.classList.remove('active');
+            pageGroupGenerator.classList.remove('active');
+            navSeatingChart.classList.remove('active');
+            navGroupGenerator.classList.remove('active');
+
+            if (page === 'seatingChart') {
+                pageSeatingChart.classList.add('active');
+                navSeatingChart.classList.add('active');
+            } else {
+                pageGroupGenerator.classList.add('active');
+                navGroupGenerator.classList.add('active');
+            }
+        }
+
+        themeToggleBtn.addEventListener('click', () => {
+            const newTheme = document.documentElement.classList.contains('dark') ? 'light' : 'dark';
+            localStorage.setItem('theme', newTheme);
+            applyTheme(newTheme);
+        });
+        
+        navSeatingChart.addEventListener('click', () => switchPage('seatingChart'));
+        navGroupGenerator.addEventListener('click', () => switchPage('groupGenerator'));
+        
+        // Help Modal Logic
+        helpBtn.addEventListener('click', () => helpModal.classList.remove('hidden'));
+        closeHelpModalBtn.addEventListener('click', () => helpModal.classList.add('hidden'));
+        helpModal.addEventListener('click', (e) => {
+             if (e.target === helpModal) { // Close if backdrop is clicked
+                 helpModal.classList.add('hidden');
+             }
+        });
+
+        // --- SEATING CHART LOGIC ---
+        (function() {
+            const canvasContainer = document.getElementById('canvas-container');
+            if (!canvasContainer) return;
+
+            const singleDeskBtn = document.getElementById('singleDeskBtn');
+            const doubleDeskBtn = document.getElementById('doubleDeskBtn');
+            const roomComponentSelect = document.getElementById('roomComponentSelect');
+            const addComponentBtn = document.getElementById('addComponentBtn');
+            const namesInput = document.getElementById('names');
+            const csvFileInput = document.getElementById('csvFileInput');
+            const assignNamesBtn = document.getElementById('assignNamesBtn');
+            const clearNamesBtn = document.getElementById('clearNamesBtn');
+            const resetCanvasBtn = document.getElementById('resetCanvasBtn');
+            const messageBox = document.getElementById('seating-chart-message-box');
+            const layoutNameInput = document.getElementById('layoutName');
+            const saveLayoutBtn = document.getElementById('saveLayoutBtn');
+            const layoutsDropdown = document.getElementById('layoutsDropdown');
+            const loadLayoutBtn = document.getElementById('loadLayoutBtn');
+            const deleteLayoutBtn = document.getElementById('deleteLayoutBtn');
+
+            const gridSize = 20;
+            let activeDraggable = null;
+            let isDragging = false;
+            let isRotating = false;
+            let itemCounter = 0;
+
+            function showMessage(message, isError = true) {
+                messageBox.textContent = message;
+                messageBox.className = 'mt-6 text-center text-sm font-medium h-5'; // Reset
+                messageBox.classList.add(isError ? 'text-red-600' : 'text-green-600', isError ? 'dark:text-red-500' : 'dark:text-green-500');
+                setTimeout(() => { messageBox.textContent = ''; }, 3000);
+            }
+
+            const getLayouts = () => JSON.parse(localStorage.getItem('seatingChartLayouts')) || {};
+            const saveLayouts = (layouts) => localStorage.setItem('seatingChartLayouts', JSON.stringify(layouts));
+
+            function createDraggableElement(classes) {
+                const el = document.createElement('div');
+                el.className = 'p-1 bg-white dark:bg-gray-600 border border-gray-300 dark:border-gray-500 rounded-md draggable ' + classes;
+                el.dataset.rotation = "0";
+
+                const rotateHandle = document.createElement('div');
+                rotateHandle.className = 'rotate-handle bg-gray-200/80 dark:bg-gray-800/80 border border-gray-300 dark:border-gray-400 text-gray-600 dark:text-gray-300';
+                rotateHandle.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M23 4v6h-6"/><path d="M1 20v-6h6"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L20.5 10a9 9 0 0 1-14.85 3.36L3.5 15"/></svg>`;
+                rotateHandle.title = "Rotate Item";
+                rotateHandle.addEventListener('mousedown', startRotation);
+                rotateHandle.addEventListener('touchstart', startRotation, { passive: false });
+                
+                const deleteBtn = document.createElement('div');
+                deleteBtn.className = 'delete-btn bg-red-600 text-white hover:bg-red-700';
+                deleteBtn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="currentColor" viewBox="0 0 16 16"><path d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708 .708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z"/></svg>`;
+                deleteBtn.title = "Delete Item";
+                deleteBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const itemToRemove = e.target.closest('.draggable');
+                    if (itemToRemove) {
+                        itemToRemove.remove();
+                        itemCounter--;
+                        if (itemCounter === 0) {
+                            canvasContainer.innerHTML = '<p class="text-gray-400 dark:text-gray-500">Add desks to get started.</p>';
+                        }
+                    }
+                });
+                
+                const alignBtn = document.createElement('div');
+                alignBtn.className = 'align-btn bg-blue-600 text-white hover:bg-blue-700';
+                alignBtn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="currentColor" viewBox="0 0 16 16"><path d="M8 1a7 7 0 0 0-7 7v3h4V8a3 3 0 0 1 6 0v3h4V8a7 7 0 0 0-7-7m7 11h-4v3h4zM1 12h4v3H1z"/></svg>`;
+                alignBtn.title = "Snap to Grid";
+                alignBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const itemToAlign = e.target.closest('.draggable');
+                    if (itemToAlign) {
+                        snapElementToGrid(itemToAlign);
+                    }
+                });
+
+                el.appendChild(alignBtn);
+                el.appendChild(deleteBtn);
+                el.appendChild(rotateHandle);
+                return el;
+            }
+
+            function createDeskElement(type, rotation = 0) {
+                const capacity = type === 'single' ? 1 : 2;
+                const desk = createDraggableElement(`desk ${type === 'double' ? 'double' : ''}`);
+                desk.dataset.deskType = type;
+                desk.dataset.capacity = capacity;
+                for (let i = 0; i < capacity; i++) {
+                    const nameSpan = document.createElement('span');
+                    nameSpan.className = 'desk-name text-gray-500 dark:text-gray-300';
+                    nameSpan.textContent = `Seat ${i + 1}`;
+                    desk.appendChild(nameSpan);
+                }
+                desk.style.transform = `rotate(${rotation}deg)`;
+                desk.dataset.rotation = rotation;
+                return desk;
+            }
+
+            function createRoomComponentElement(type, rotation = 0) {
+                const component = createDraggableElement(`room-component ${type}`);
+                component.dataset.componentType = type;
+                let text = '';
+                switch(type) {
+                    case 'door': component.classList.add('bg-yellow-800/70', 'border-yellow-900/80', 'dark:bg-yellow-900/70', 'dark:border-yellow-800/80', 'text-white/80'); text = 'Door'; break;
+                    case 'whiteboard': component.classList.add('bg-gray-50', 'border-gray-400', 'dark:bg-gray-200', 'dark:border-gray-500', 'text-gray-900'); text = 'Whiteboard'; break;
+                    case 'smartboard': component.classList.add('bg-gray-800', 'border-gray-500', 'dark:bg-black', 'dark:border-gray-400', 'text-gray-300'); text = 'Smartboard'; break;
+                }
+                const textNode = document.createElement('span');
+                textNode.textContent = text;
+                component.insertBefore(textNode, component.firstChild);
+                component.style.transform = `rotate(${rotation}deg)`;
+                component.dataset.rotation = rotation;
+                return component;
+            }
+            
+            function addItemToCanvas(element) {
+                 if (itemCounter === 0) canvasContainer.innerHTML = '';
+                itemCounter++;
+                element.style.top = `${Math.round(20 / gridSize) * gridSize}px`;
+                element.style.left = `${Math.round(20 / gridSize) * gridSize}px`;
+                element.addEventListener('mousedown', dragStart);
+                element.addEventListener('touchstart', dragStart, { passive: false });
+                canvasContainer.appendChild(element);
+            }
+            
+            function dragStart(e) {
+                if (e.target.closest('.rotate-handle') || e.target.closest('.delete-btn') || e.target.closest('.align-btn')) return;
+                activeDraggable = e.target.closest('.draggable');
+                if (!activeDraggable) return;
+                isDragging = true;
+                e.preventDefault();
+
+                const initialMouseX = e.type === 'touchstart' ? e.touches[0].clientX : e.clientX;
+                const initialMouseY = e.type === 'touchstart' ? e.touches[0].clientY : e.clientY;
+                
+                const initialElX = activeDraggable.offsetLeft;
+                const initialElY = activeDraggable.offsetTop;
+
+                function dragMove(e) {
+                    if (!activeDraggable || !isDragging) return;
+                    let currentMouseX = e.type === 'touchmove' ? e.touches[0].clientX : e.clientX;
+                    let currentMouseY = e.type === 'touchmove' ? e.touches[0].clientY : e.clientY;
+
+                    const deltaX = currentMouseX - initialMouseX;
+                    const deltaY = currentMouseY - initialMouseY;
+
+                    let newX = initialElX + deltaX;
+                    let newY = initialElY + deltaY;
+                    
+                    // Snap the potential position to the grid
+                    newX = Math.round(newX / gridSize) * gridSize;
+                    newY = Math.round(newY / gridSize) * gridSize;
+                    
+                    // Boundary checks
+                    const elWidth = activeDraggable.offsetWidth;
+                    const elHeight = activeDraggable.offsetHeight;
+                    const containerWidth = canvasContainer.offsetWidth;
+                    const containerHeight = canvasContainer.offsetHeight;
+
+                    // Calculate the maximum allowed positions that are also on the grid
+                    const maxGridX = Math.floor((containerWidth - elWidth) / gridSize) * gridSize;
+                    const maxGridY = Math.floor((containerHeight - elHeight) / gridSize) * gridSize;
+
+                    // Clamp the snapped position to the valid grid-aligned boundaries
+                    newX = Math.max(0, Math.min(newX, maxGridX));
+                    newY = Math.max(0, Math.min(newY, maxGridY));
+
+                    activeDraggable.style.left = `${newX}px`;
+                    activeDraggable.style.top = `${newY}px`;
+                }
+
+                function dragEnd() {
+                    isDragging = false;
+                    activeDraggable = null;
+                    document.removeEventListener('mousemove', dragMove);
+                    document.removeEventListener('mouseup', dragEnd);
+                    document.removeEventListener('touchmove', dragMove);
+                    document.removeEventListener('touchend', dragEnd);
+                }
+                document.addEventListener('mousemove', dragMove);
+                document.addEventListener('mouseup', dragEnd);
+                document.addEventListener('touchmove', dragMove);
+                document.addEventListener('touchend', dragEnd);
+            }
+
+            function startRotation(e) {
+                e.stopPropagation();
+                activeDraggable = e.target.closest('.draggable');
+                if (!activeDraggable) return;
+                isRotating = true;
+                e.preventDefault();
+
+                const rect = activeDraggable.getBoundingClientRect();
+                const centerX = rect.left + rect.width / 2;
+                const centerY = rect.top + rect.height / 2;
+                const startX = e.type === 'touchstart' ? e.touches[0].clientX : e.clientX;
+                const startY = e.type === 'touchstart' ? e.touches[0].clientY : e.clientY;
+                const startAngleRad = Math.atan2(startY - centerY, startX - centerX);
+                const startAngleDeg = startAngleRad * 180 / Math.PI;
+                const initialRotation = parseFloat(activeDraggable.dataset.rotation) || 0;
+                
+                function doRotation(e) {
+                    if (!isRotating || !activeDraggable) return;
+                    let currentX = e.type === 'touchmove' ? e.touches[0].clientX : e.clientX;
+                    let currentY = e.type === 'touchmove' ? e.touches[0].clientY : e.clientY;
+                    const currentAngleRad = Math.atan2(currentY - centerY, currentX - centerX);
+                    const currentAngleDeg = currentAngleRad * 180 / Math.PI;
+                    const angleChange = currentAngleDeg - startAngleDeg;
+                    let newRotation = initialRotation + angleChange;
+                    newRotation = Math.round(newRotation / 15) * 15;
+                    activeDraggable.style.transform = `rotate(${newRotation}deg)`;
+                    activeDraggable.dataset.rotation = newRotation;
+                }
+
+                function stopRotation() {
+                    isRotating = false;
+                    if (activeDraggable) {
+                       snapElementToGrid(activeDraggable);
+                    }
+                    activeDraggable = null;
+                    document.removeEventListener('mousemove', doRotation);
+                    document.removeEventListener('mouseup', stopRotation);
+                    document.removeEventListener('touchmove', doRotation);
+                    document.removeEventListener('touchend', stopRotation);
+                }
+                document.addEventListener('mousemove', doRotation);
+                document.addEventListener('mouseup', stopRotation);
+                document.addEventListener('touchmove', doRotation);
+                document.addEventListener('touchend', stopRotation);
+            }
+
+            function snapElementToGrid(element) {
+                if (!element) return;
+                const angle = parseFloat(element.dataset.rotation) || 0;
+                const angleRad = angle * Math.PI / 180;
+                const sin = Math.sin(angleRad);
+                const cos = Math.cos(angleRad);
+
+                const w = element.offsetWidth;
+                const h = element.offsetHeight;
+                const left = element.offsetLeft;
+                const top = element.offsetTop;
+
+                const cx = w / 2;
+                const cy = h / 2;
+
+                const corners = [ { x: 0, y: 0 }, { x: w, y: 0 }, { x: w, y: h }, { x: 0, y: h } ];
+                let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
+
+                corners.forEach(p => {
+                    const translatedX = p.x - cx;
+                    const translatedY = p.y - cy;
+                    const rotatedX = translatedX * cos - translatedY * sin;
+                    const rotatedY = translatedX * sin + translatedY * cos;
+                    p.x = rotatedX + cx;
+                    p.y = rotatedY + cy;
+                    if (p.x < minX) minX = p.x;
+                    if (p.y < minY) minY = p.y;
+                    if (p.x > maxX) maxX = p.x;
+                    if (p.y > maxY) maxY = p.y;
+                });
+
+                const visualLeft = left + minX;
+                const visualTop = top + minY;
+                const visualWidth = maxX - minX;
+                const visualHeight = maxY - minY;
+
+                let snappedVisualLeft = Math.round(visualLeft / gridSize) * gridSize;
+                let snappedVisualTop = Math.round(visualTop / gridSize) * gridSize;
+
+                // Boundary check the snapped position
+                const containerWidth = canvasContainer.offsetWidth;
+                const containerHeight = canvasContainer.offsetHeight;
+                const maxGridX = Math.floor((containerWidth - visualWidth) / gridSize) * gridSize;
+                const maxGridY = Math.floor((containerHeight - visualHeight) / gridSize) * gridSize;
+                
+                snappedVisualLeft = Math.max(0, Math.min(snappedVisualLeft, maxGridX));
+                snappedVisualTop = Math.max(0, Math.min(snappedVisualTop, maxGridY));
+
+                const deltaX = snappedVisualLeft - visualLeft;
+                const deltaY = snappedVisualTop - visualTop;
+
+                element.style.left = `${left + deltaX}px`;
+                element.style.top = `${top + deltaY}px`;
+            }
+
+            function resetCanvas() {
+                canvasContainer.innerHTML = '<p class="text-gray-400 dark:text-gray-500">Add desks to get started.</p>';
+                namesInput.value = '';
+                itemCounter = 0;
+            }
+
+            function assignNames() {
+                const names = namesInput.value.trim().split('\n').filter(name => name.trim() !== '');
+                if (names.length === 0) return showMessage("Please enter some names to assign.");
+                for (let i = names.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [names[i], names[j]] = [names[j], names[i]]; }
+                const deskSlots = Array.from(canvasContainer.querySelectorAll('.desk-name'));
+                if (deskSlots.length === 0) return showMessage("There are no desks to assign names to.");
+                if (names.length > deskSlots.length) showMessage(`Warning: ${names.length} names, but only ${deskSlots.length} seats.`);
+                else showMessage(`Assigned ${Math.min(names.length, deskSlots.length)} names.`, false);
+                clearNames();
+                deskSlots.forEach((slot, index) => {
+                    if (index < names.length) {
+                        slot.textContent = names[index];
+                        slot.classList.remove('text-gray-500', 'dark:text-gray-300');
+                        slot.classList.add('text-gray-900', 'dark:text-white', 'font-medium');
+                    }
+                });
+            }
+            
+            function clearNames() {
+                canvasContainer.querySelectorAll('.desk-name').forEach((slot) => {
+                    const parentDesk = slot.closest('.desk');
+                    const slots = Array.from(parentDesk.querySelectorAll('.desk-name'));
+                    const index = slots.indexOf(slot);
+                    slot.textContent = `Seat ${index + 1}`;
+                    slot.classList.add('text-gray-500', 'dark:text-gray-300');
+                    slot.classList.remove('text-gray-900', 'dark:text-white', 'font-medium');
+                });
+            }
+
+            function populateLayoutsDropdown() {
+                const layouts = getLayouts();
+                layoutsDropdown.innerHTML = '<option value="">-- Select a Layout --</option>';
+                Object.keys(layouts).forEach(name => {
+                    const option = document.createElement('option');
+                    option.value = name; option.textContent = name;
+                    layoutsDropdown.appendChild(option);
+                });
+            }
+            
+            function saveCurrentLayout() {
+                const name = layoutNameInput.value.trim();
+                if (!name) return showMessage('Please enter a name for the layout.');
+                const layoutData = Array.from(canvasContainer.querySelectorAll('.draggable')).map(el => {
+                    const data = { left: el.style.left, top: el.style.top, rotation: el.dataset.rotation || 0 };
+                    if (el.classList.contains('desk')) { data.itemClass = 'desk'; data.deskType = el.dataset.deskType; } 
+                    else { data.itemClass = 'component'; data.componentType = el.dataset.componentType; }
+                    return data;
+                });
+                const layouts = getLayouts();
+                layouts[name] = layoutData;
+                saveLayouts(layouts);
+                showMessage(`Layout "${name}" saved.`, false);
+                populateLayoutsDropdown();
+                layoutsDropdown.value = name;
+            }
+
+            function loadSelectedLayout() {
+                const name = layoutsDropdown.value;
+                if (!name) return showMessage('Please select a layout to load.');
+                const layoutData = getLayouts()[name];
+                if (!layoutData) return showMessage(`Layout "${name}" not found.`);
+                resetCanvas();
+                if (layoutData.length === 0) return;
+                canvasContainer.innerHTML = '';
+                layoutData.forEach(itemInfo => {
+                    let element;
+                    const rotation = itemInfo.rotation || 0;
+                    if (itemInfo.itemClass === 'desk') element = createDeskElement(itemInfo.deskType, rotation);
+                    else if (itemInfo.itemClass === 'component') element = createRoomComponentElement(itemInfo.componentType, rotation);
+                    if (element) {
+                        element.style.left = itemInfo.left;
+                        element.style.top = itemInfo.top;
+                        addItemToCanvas(element)
+                        itemCounter--;
+                    }
+                });
+                itemCounter = layoutData.length;
+                layoutNameInput.value = name;
+                showMessage(`Layout "${name}" loaded.`, false);
+            }
+
+            function deleteSelectedLayout() {
+                const name = layoutsDropdown.value;
+                if (!name) return showMessage('Please select a layout to delete.');
+                const layouts = getLayouts();
+                if (!layouts[name]) return showMessage(`Layout "${name}" not found.`);
+                delete layouts[name];
+                saveLayouts(layouts);
+                showMessage(`Layout "${name}" deleted.`, false);
+                populateLayoutsDropdown();
+                layoutNameInput.value = '';
+            }
+
+            function handleFileUpload(event) {
+                const file = event.target.files[0];
+                if (!file || !file.name.endsWith('.csv')) return file && showMessage('Please upload a valid .csv file.');
+                const reader = new FileReader();
+                reader.onload = e => {
+                    const names = e.target.result.split(/,|\n/).map(n => n.trim()).filter(Boolean);
+                    namesInput.value = names.join('\n');
+                    showMessage(`Imported ${names.length} names.`, false);
+                };
+                reader.onerror = () => showMessage('Failed to read the file.');
+                reader.readAsText(file);
+                event.target.value = '';
+            }
+
+            singleDeskBtn.addEventListener('click', () => addItemToCanvas(createDeskElement('single')));
+            doubleDeskBtn.addEventListener('click', () => addItemToCanvas(createDeskElement('double')));
+            addComponentBtn.addEventListener('click', () => addItemToCanvas(createRoomComponentElement(roomComponentSelect.value)));
+            assignNamesBtn.addEventListener('click', assignNames);
+            clearNamesBtn.addEventListener('click', clearNames);
+            resetCanvasBtn.addEventListener('click', resetCanvas);
+            csvFileInput.addEventListener('change', handleFileUpload);
+            saveLayoutBtn.addEventListener('click', saveCurrentLayout);
+            loadLayoutBtn.addEventListener('click', loadSelectedLayout);
+            deleteLayoutBtn.addEventListener('click', deleteSelectedLayout);
+            
+            // Initial population
+            populateLayoutsDropdown();
+        })();
+
+        // --- GROUP GENERATOR LOGIC ---
+        (function() {
+            const groupNamesInput = document.getElementById('groupNames');
+            const groupCsvFileInput = document.getElementById('groupCsvFileInput');
+            const numGroupsInput = document.getElementById('numGroups');
+            const generateGroupsBtn = document.getElementById('generateGroupsBtn');
+            const groupsResultContainer = document.getElementById('groupsResultContainer');
+            const messageBox = document.getElementById('group-generator-message-box');
+
+            function showMessage(message, isError = true) {
+                messageBox.textContent = message;
+                messageBox.className = 'mt-6 text-center text-sm font-medium h-5'; // Reset
+                messageBox.classList.add(isError ? 'text-red-600' : 'text-green-600', isError ? 'dark:text-red-500' : 'dark:text-green-500');
+                setTimeout(() => { messageBox.textContent = ''; }, 3000);
+            }
+
+            function handleGroupFileUpload(event) {
+                const file = event.target.files[0];
+                if (!file || !file.name.endsWith('.csv')) return file && showMessage('Please upload a valid .csv file.');
+                const reader = new FileReader();
+                reader.onload = e => {
+                    const names = e.target.result.split(/,|\n/).map(n => n.trim()).filter(Boolean);
+                    groupNamesInput.value = names.join('\n');
+                    showMessage(`Imported ${names.length} names.`, false);
+                };
+                reader.onerror = () => showMessage('Failed to read the file.');
+                reader.readAsText(file);
+                event.target.value = '';
+            }
+
+            function generateGroups() {
+                const names = groupNamesInput.value.trim().split('\n').filter(name => name.trim() !== '');
+                const numGroups = parseInt(numGroupsInput.value, 10);
+
+                if (names.length === 0) return showMessage('Please enter student names.');
+                if (isNaN(numGroups) || numGroups <= 0) return showMessage('Please enter a valid number of groups.');
+                if (numGroups > names.length) return showMessage('Number of groups cannot exceed the number of students.');
+
+                // Shuffle names
+                for (let i = names.length - 1; i > 0; i--) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    [names[i], names[j]] = [names[j], names[i]];
+                }
+
+                // Create group buckets
+                const groups = Array.from({ length: numGroups }, () => []);
+                
+                // Distribute names
+                names.forEach((name, index) => {
+                    groups[index % numGroups].push(name);
+                });
+
+                // Display groups
+                groupsResultContainer.innerHTML = '';
+                groups.forEach((group, index) => {
+                    const groupCard = document.createElement('div');
+                    groupCard.className = 'bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-4 shadow';
+                    
+                    const title = document.createElement('h3');
+                    title.className = 'font-bold text-lg mb-2 text-red-700 dark:text-red-500';
+                    title.textContent = `Group ${index + 1}`;
+                    groupCard.appendChild(title);
+
+                    const list = document.createElement('ul');
+                    list.className = 'space-y-1';
+                    group.forEach(name => {
+                        const listItem = document.createElement('li');
+                        listItem.className = 'text-gray-700 dark:text-gray-300';
+                        listItem.textContent = name;
+                        list.appendChild(listItem);
+                    });
+                    groupCard.appendChild(list);
+                    groupsResultContainer.appendChild(groupCard);
+                });
+                showMessage(`Successfully created ${numGroups} groups.`, false);
+            }
+
+            generateGroupsBtn.addEventListener('click', generateGroups);
+            groupCsvFileInput.addEventListener('change', handleGroupFileUpload);
+        })();
+
+
+        // --- INITIALIZATION ---
+        document.addEventListener('DOMContentLoaded', () => {
+            const savedTheme = localStorage.getItem('theme');
+            const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            applyTheme(savedTheme || (systemPrefersDark ? 'dark' : 'light'));
+            switchPage('seatingChart'); // Default page
+        });
+    </script>
+</body>
+</html>
+
