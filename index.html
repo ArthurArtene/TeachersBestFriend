@@ -151,12 +151,11 @@
                 </svg>
                 <h1 class="text-xl md:text-2xl font-bold text-gray-800 dark:text-gray-100">Teachers Best Friend</h1>
             </div>
-            <div id="nav-container" class="hidden flex items-center space-x-2 bg-gray-100 dark:bg-gray-900 p-1 rounded-lg">
+            <div id="nav-container" class="flex items-center space-x-2 bg-gray-100 dark:bg-gray-900 p-1 rounded-lg">
                 <button id="navSeatingChart" class="nav-btn px-3 py-1.5 text-sm font-semibold rounded-md transition">Seating Chart</button>
                 <button id="navGroupGenerator" class="nav-btn px-3 py-1.5 text-sm font-semibold rounded-md transition">Group Generator</button>
             </div>
             <div class="flex items-center space-x-1">
-                 <div id="auth-container" class="flex items-center space-x-2"></div>
                 <button id="themeToggleBtn" class="p-2 rounded-full text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none">
                     <svg id="theme-icon-light" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" /></svg>
                     <svg id="theme-icon-dark" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" /></svg>
@@ -167,121 +166,109 @@
             </div>
         </header>
 
-        <div id="login-prompt" class="p-8 text-center">
-            <h2 class="text-2xl font-bold mb-4">Welcome!</h2>
-            <p class="text-gray-600 dark:text-gray-400 mb-6">Please log in with your Google account to create and save your classroom layouts.</p>
-            <button id="loginBtn" class="bg-red-700 text-white font-semibold py-2 px-6 rounded-md transition hover:bg-red-800 inline-flex items-center space-x-2">
-                <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" width="48px" height="48px"><path fill="#FFC107" d="M43.611,20.083H42V20H24v8h11.303c-1.649,4.657-6.08,8-11.303,8c-6.627,0-12-5.373-12-12c0-6.627,5.373-12,12-12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C12.955,4,4,12.955,4,24c0,11.045,8.955,20,20,20c11.045,0,20-8.955,20-20C44,22.659,43.862,21.35,43.611,20.083z"/><path fill="#FF3D00" d="M6.306,14.691l6.571,4.819C14.655,15.108,18.961,12,24,12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C16.318,4,9.656,8.337,6.306,14.691z"/><path fill="#4CAF50" d="M24,44c5.166,0,9.86-1.977,13.409-5.192l-6.19-5.238C29.211,35.091,26.715,36,24,36c-5.222,0-9.619-3.317-11.283-7.946l-6.522,5.025C9.505,39.556,16.227,44,24,44z"/><path fill="#1976D2" d="M43.611,20.083H42V20H24v8h11.303c-0.792,2.237-2.231,4.166-4.087,5.574l6.19,5.238C44.438,36.333,48,31,48,24C48,22.659,47.862,21.35,47.611,20.083z"/></svg>
-                <span>Login with Google</span>
-            </button>
-            <div id="login-message-box" class="mt-4 text-center text-sm font-medium text-red-600 dark:text-red-500"></div>
-        </div>
-
-        <div id="main-content" class="hidden">
-            <main class="p-6 md:p-8">
-                <!-- Seating Chart Page -->
-                <div id="page-seating-chart" class="page">
-                    <header class="text-center mb-8">
-                        <h1 class="text-3xl md:text-4xl font-bold text-gray-800 dark:text-gray-100">Seating Chart Generator</h1>
-                        <p class="text-gray-500 dark:text-gray-400 mt-2">Create, save, and load layouts to randomly assign seats.</p>
-                    </header>
-                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                        <div class="lg:col-span-1 bg-gray-50 dark:bg-gray-700/50 p-6 rounded-lg border border-gray-200 dark:border-gray-600">
-                            <h2 class="text-xl font-semibold mb-4 border-b pb-2 border-gray-200 dark:border-gray-600">Controls</h2>
-                            <div class="mb-6">
-                                <h3 class="font-medium text-gray-700 dark:text-gray-300 mb-2">1. Add Desks</h3>
-                                <p class="text-sm text-gray-500 dark:text-gray-400 mb-2">Click icons on desks to align, delete, or rotate (snaps to 15°).</p>
-                                <div class="flex flex-col space-y-2">
-                                     <button id="singleDeskBtn" class="w-full bg-red-700 text-white font-semibold py-2 px-4 rounded-md transition hover:bg-red-800">Add Single Desk</button>
-                                     <button id="doubleDeskBtn" class="w-full bg-red-700 text-white font-semibold py-2 px-4 rounded-md transition hover:bg-red-800">Add Double Desk</button>
-                                </div>
-                            </div>
-                            <div class="mb-6">
-                                <h3 class="font-medium text-gray-700 dark:text-gray-300 mb-2">2. Add Room Components</h3>
-                                <div class="flex space-x-2">
-                                    <select id="roomComponentSelect" class="block w-full rounded-md border-gray-300 dark:border-gray-500 bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-200 shadow-sm focus:border-red-500 focus:ring-red-500 sm:text-sm">
-                                        <option value="door">Door</option>
-                                        <option value="whiteboard">Whiteboard</option>
-                                        <option value="smartboard">Smartboard</option>
-                                    </select>
-                                    <button id="addComponentBtn" class="bg-gray-500 text-white font-semibold py-2 px-4 rounded-md transition hover:bg-gray-600 flex-shrink-0">Add</button>
-                                </div>
-                            </div>
-                            <div class="mb-6">
-                                 <div class="flex justify-between items-center mb-2">
-                                    <h3 class="font-medium text-gray-700 dark:text-gray-300">3. Enter Names</h3>
-                                    <label for="csvFileInput" class="text-sm bg-gray-200 hover:bg-gray-300 text-gray-700 dark:bg-gray-600 dark:hover:bg-gray-500 dark:text-gray-200 font-semibold py-1 px-3 rounded-md cursor-pointer transition">Upload CSV</label>
-                                    <input type="file" id="csvFileInput" class="hidden" accept=".csv">
-                                </div>
-                                <textarea id="names" rows="6" class="block w-full rounded-md border-gray-300 dark:border-gray-500 bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-200 dark:placeholder-gray-400 shadow-sm focus:border-red-500 focus:ring-red-500 sm:text-sm" placeholder="Enter names, one per line..."></textarea>
-                            </div>
-                            <div class="mb-6">
-                                <h3 class="font-medium text-gray-700 dark:text-gray-300 mb-2">4. Layout Management</h3>
-                                <div class="flex space-x-2 mb-2">
-                                    <input type="text" id="layoutName" class="block w-full rounded-md border-gray-300 dark:border-gray-500 bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-200 dark:placeholder-gray-400 shadow-sm focus:border-red-500 focus:ring-red-500 sm:text-sm" placeholder="Layout Name">
-                                    <button id="saveLayoutBtn" class="bg-gray-800 dark:bg-gray-200 text-white dark:text-gray-800 font-semibold py-2 px-4 rounded-md hover:bg-black dark:hover:bg-white transition">Save</button>
-                                </div>
-                                <div class="flex space-x-2">
-                                    <select id="layoutsDropdown" class="block w-full rounded-md border-gray-300 dark:border-gray-500 bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-200 shadow-sm focus:border-red-500 focus:ring-red-500 sm:text-sm"><option value="">-- Select a Layout --</option></select>
-                                    <button id="loadLayoutBtn" class="bg-gray-600 text-white p-2 rounded-md hover:bg-gray-700 transition flex-shrink-0" title="Load Layout"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M3.5 6a.5.5 0 0 0-.5.5v8a.5.5 0 0 0 .5.5h9a.5.5 0 0 0 .5-.5v-8a.5.5 0 0 0-.5-.5h-2a.5.5 0 0 1 0-1h2A1.5 1.5 0 0 1 14 6.5v8A1.5 1.5 0 0 1 12.5 16h-9A1.5 1.5 0 0 1 2 14.5v-8A1.5 1.5 0 0 1 3.5 5h2a.5.5 0 0 1 0 1z"/><path fill-rule="evenodd" d="M7.646 11.854a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 10.293V1.5a.5.5 0 0 0-1 0v8.793L6.354 9.146a.5.5 0 1 0-.708.708z"/></svg></button>
-                                    <button id="deleteLayoutBtn" class="bg-red-600 text-white p-2 rounded-md hover:bg-red-700 transition flex-shrink-0" title="Delete Layout"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16"><path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0z"/><path d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4zM2.5 3h11V2h-11z"/></svg></button>
-                                </div>
-                            </div>
-                            <div>
-                                 <h3 class="font-medium text-gray-700 dark:text-gray-300 mb-2">5. Assign & Manage</h3>
-                                <button id="assignNamesBtn" class="w-full bg-green-600 text-white font-semibold py-2 px-4 rounded-md hover:bg-green-700 transition mb-2">Assign Names</button>
-                                <button id="clearNamesBtn" class="w-full bg-yellow-500 text-white font-semibold py-2 px-4 rounded-md hover:bg-yellow-600 transition mb-2">Clear Names</button>
-                                <button id="resetCanvasBtn" class="w-full bg-red-600 text-white font-semibold py-2 px-4 rounded-md hover:bg-red-700 transition">Reset Canvas</button>
+        <main class="p-6 md:p-8">
+            <!-- Seating Chart Page -->
+            <div id="page-seating-chart" class="page">
+                <header class="text-center mb-8">
+                    <h1 class="text-3xl md:text-4xl font-bold text-gray-800 dark:text-gray-100">Seating Chart Generator</h1>
+                    <p class="text-gray-500 dark:text-gray-400 mt-2">Create, save, and load layouts to randomly assign seats.</p>
+                </header>
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                    <div class="lg:col-span-1 bg-gray-50 dark:bg-gray-700/50 p-6 rounded-lg border border-gray-200 dark:border-gray-600">
+                        <h2 class="text-xl font-semibold mb-4 border-b pb-2 border-gray-200 dark:border-gray-600">Controls</h2>
+                        <div class="mb-6">
+                            <h3 class="font-medium text-gray-700 dark:text-gray-300 mb-2">1. Add Desks</h3>
+                            <p class="text-sm text-gray-500 dark:text-gray-400 mb-2">Click icons on desks to align, delete, or rotate (snaps to 15°).</p>
+                            <div class="flex flex-col space-y-2">
+                                 <button id="singleDeskBtn" class="w-full bg-red-700 text-white font-semibold py-2 px-4 rounded-md transition hover:bg-red-800">Add Single Desk</button>
+                                 <button id="doubleDeskBtn" class="w-full bg-red-700 text-white font-semibold py-2 px-4 rounded-md transition hover:bg-red-800">Add Double Desk</button>
                             </div>
                         </div>
-                        <div id="canvas-container" class="lg:col-span-2 bg-gray-50 dark:bg-gray-900/50 p-2 rounded-lg border border-gray-200 dark:border-gray-600 flex items-center justify-center min-h-[400px] lg:min-h-[500px]">
-                             <p class="text-gray-400 dark:text-gray-500">Add desks to get started.</p>
+                        <div class="mb-6">
+                            <h3 class="font-medium text-gray-700 dark:text-gray-300 mb-2">2. Add Room Components</h3>
+                            <div class="flex space-x-2">
+                                <select id="roomComponentSelect" class="block w-full rounded-md border-gray-300 dark:border-gray-500 bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-200 shadow-sm focus:border-red-500 focus:ring-red-500 sm:text-sm">
+                                    <option value="door">Door</option>
+                                    <option value="whiteboard">Whiteboard</option>
+                                    <option value="smartboard">Smartboard</option>
+                                </select>
+                                <button id="addComponentBtn" class="bg-gray-500 text-white font-semibold py-2 px-4 rounded-md transition hover:bg-gray-600 flex-shrink-0">Add</button>
+                            </div>
+                        </div>
+                        <div class="mb-6">
+                             <div class="flex justify-between items-center mb-2">
+                                <h3 class="font-medium text-gray-700 dark:text-gray-300">3. Enter Names</h3>
+                                <label for="csvFileInput" class="text-sm bg-gray-200 hover:bg-gray-300 text-gray-700 dark:bg-gray-600 dark:hover:bg-gray-500 dark:text-gray-200 font-semibold py-1 px-3 rounded-md cursor-pointer transition">Upload CSV</label>
+                                <input type="file" id="csvFileInput" class="hidden" accept=".csv">
+                            </div>
+                            <textarea id="names" rows="6" class="block w-full rounded-md border-gray-300 dark:border-gray-500 bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-200 dark:placeholder-gray-400 shadow-sm focus:border-red-500 focus:ring-red-500 sm:text-sm" placeholder="Enter names, one per line..."></textarea>
+                        </div>
+                        <div class="mb-6">
+                            <h3 class="font-medium text-gray-700 dark:text-gray-300 mb-2">4. Layout Management</h3>
+                            <div class="flex space-x-2 mb-2">
+                                <input type="text" id="layoutName" class="block w-full rounded-md border-gray-300 dark:border-gray-500 bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-200 dark:placeholder-gray-400 shadow-sm focus:border-red-500 focus:ring-red-500 sm:text-sm" placeholder="Layout Name">
+                                <button id="saveLayoutBtn" class="bg-gray-800 dark:bg-gray-200 text-white dark:text-gray-800 font-semibold py-2 px-4 rounded-md hover:bg-black dark:hover:bg-white transition">Save</button>
+                            </div>
+                            <div class="flex space-x-2">
+                                <select id="layoutsDropdown" class="block w-full rounded-md border-gray-300 dark:border-gray-500 bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-200 shadow-sm focus:border-red-500 focus:ring-red-500 sm:text-sm"><option value="">-- Select a Layout --</option></select>
+                                <button id="loadLayoutBtn" class="bg-gray-600 text-white p-2 rounded-md hover:bg-gray-700 transition flex-shrink-0" title="Load Layout"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M3.5 6a.5.5 0 0 0-.5.5v8a.5.5 0 0 0 .5.5h9a.5.5 0 0 0 .5-.5v-8a.5.5 0 0 0-.5-.5h-2a.5.5 0 0 1 0-1h2A1.5 1.5 0 0 1 14 6.5v8A1.5 1.5 0 0 1 12.5 16h-9A1.5 1.5 0 0 1 2 14.5v-8A1.5 1.5 0 0 1 3.5 5h2a.5.5 0 0 1 0 1z"/><path fill-rule="evenodd" d="M7.646 11.854a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 10.293V1.5a.5.5 0 0 0-1 0v8.793L6.354 9.146a.5.5 0 1 0-.708.708z"/></svg></button>
+                                <button id="deleteLayoutBtn" class="bg-red-600 text-white p-2 rounded-md hover:bg-red-700 transition flex-shrink-0" title="Delete Layout"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16"><path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0z"/><path d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4zM2.5 3h11V2h-11z"/></svg></button>
+                            </div>
+                        </div>
+                        <div>
+                             <h3 class="font-medium text-gray-700 dark:text-gray-300 mb-2">5. Assign & Manage</h3>
+                            <button id="assignNamesBtn" class="w-full bg-green-600 text-white font-semibold py-2 px-4 rounded-md hover:bg-green-700 transition mb-2">Assign Names</button>
+                            <button id="clearNamesBtn" class="w-full bg-yellow-500 text-white font-semibold py-2 px-4 rounded-md hover:bg-yellow-600 transition mb-2">Clear Names</button>
+                            <button id="resetCanvasBtn" class="w-full bg-red-600 text-white font-semibold py-2 px-4 rounded-md hover:bg-red-700 transition">Reset Canvas</button>
                         </div>
                     </div>
-                    <div id="seating-chart-message-box" class="mt-6 text-center text-sm font-medium min-h-[20px]"></div>
+                    <div id="canvas-container" class="lg:col-span-2 bg-gray-50 dark:bg-gray-900/50 p-2 rounded-lg border border-gray-200 dark:border-gray-600 flex items-center justify-center min-h-[400px] lg:min-h-[500px]">
+                         <p class="text-gray-400 dark:text-gray-500">Add desks to get started.</p>
+                    </div>
                 </div>
+                <div id="seating-chart-message-box" class="mt-6 text-center text-sm font-medium h-5"></div>
+            </div>
 
-                <!-- Group Generator Page -->
-                <div id="page-group-generator" class="page">
-                    <header class="text-center mb-8">
-                        <h1 class="text-3xl md:text-4xl font-bold text-gray-800 dark:text-gray-100">Random Group Generator</h1>
-                        <p class="text-gray-500 dark:text-gray-400 mt-2">Randomly assign students into groups.</p>
-                    </header>
-                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                        <div class="lg:col-span-1 bg-gray-50 dark:bg-gray-700/50 p-6 rounded-lg border border-gray-200 dark:border-gray-600">
-                            <h2 class="text-xl font-semibold mb-4 border-b pb-2 border-gray-200 dark:border-gray-600">Configuration</h2>
-                            <div class="mb-6">
-                                <div class="flex justify-between items-center mb-2">
-                                   <h3 class="font-medium text-gray-700 dark:text-gray-300">1. Enter Names</h3>
-                                   <label for="groupCsvFileInput" class="text-sm bg-gray-200 hover:bg-gray-300 text-gray-700 dark:bg-gray-600 dark:hover:bg-gray-500 dark:text-gray-200 font-semibold py-1 px-3 rounded-md cursor-pointer transition">Upload CSV</label>
-                                   <input type="file" id="groupCsvFileInput" class="hidden" accept=".csv">
-                               </div>
-                               <textarea id="groupNames" rows="10" class="block w-full rounded-md border-gray-300 dark:border-gray-500 bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-200 dark:placeholder-gray-400 shadow-sm focus:border-red-500 focus:ring-red-500 sm:text-sm" placeholder="Enter names, one per line..."></textarea>
-                            </div>
-                            <div class="mb-6">
-                                <h3 class="font-medium text-gray-700 dark:text-gray-300 mb-2">2. Set Number of Groups</h3>
-                                <input type="number" id="numGroups" min="1" value="2" class="block w-full rounded-md border-gray-300 dark:border-gray-500 bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-200 dark:placeholder-gray-400 shadow-sm focus:border-red-500 focus:ring-red-500 sm:text-sm">
-                            </div>
-                            <div>
-                                 <h3 class="font-medium text-gray-700 dark:text-gray-300 mb-2">3. Generate</h3>
-                                <button id="generateGroupsBtn" class="w-full bg-green-600 text-white font-semibold py-2 px-4 rounded-md hover:bg-green-700 transition">Generate Groups</button>
-                            </div>
+            <!-- Group Generator Page -->
+            <div id="page-group-generator" class="page">
+                <header class="text-center mb-8">
+                    <h1 class="text-3xl md:text-4xl font-bold text-gray-800 dark:text-gray-100">Random Group Generator</h1>
+                    <p class="text-gray-500 dark:text-gray-400 mt-2">Randomly assign students into groups.</p>
+                </header>
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                    <div class="lg:col-span-1 bg-gray-50 dark:bg-gray-700/50 p-6 rounded-lg border border-gray-200 dark:border-gray-600">
+                        <h2 class="text-xl font-semibold mb-4 border-b pb-2 border-gray-200 dark:border-gray-600">Configuration</h2>
+                        <div class="mb-6">
+                            <div class="flex justify-between items-center mb-2">
+                               <h3 class="font-medium text-gray-700 dark:text-gray-300">1. Enter Names</h3>
+                               <label for="groupCsvFileInput" class="text-sm bg-gray-200 hover:bg-gray-300 text-gray-700 dark:bg-gray-600 dark:hover:bg-gray-500 dark:text-gray-200 font-semibold py-1 px-3 rounded-md cursor-pointer transition">Upload CSV</label>
+                               <input type="file" id="groupCsvFileInput" class="hidden" accept=".csv">
+                           </div>
+                           <textarea id="groupNames" rows="10" class="block w-full rounded-md border-gray-300 dark:border-gray-500 bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-200 dark:placeholder-gray-400 shadow-sm focus:border-red-500 focus:ring-red-500 sm:text-sm" placeholder="Enter names, one per line..."></textarea>
                         </div>
-                        <div class="lg:col-span-2 p-2 min-h-[400px] lg:min-h-[500px]">
-                            <h2 class="text-xl font-semibold mb-4 text-center">Generated Groups</h2>
-                            <div id="groupsResultContainer" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-                                <p class="text-gray-400 dark:text-gray-500 col-span-full text-center mt-8">Groups will appear here once generated.</p>
-                            </div>
+                        <div class="mb-6">
+                            <h3 class="font-medium text-gray-700 dark:text-gray-300 mb-2">2. Set Number of Groups</h3>
+                            <input type="number" id="numGroups" min="1" value="2" class="block w-full rounded-md border-gray-300 dark:border-gray-500 bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-200 dark:placeholder-gray-400 shadow-sm focus:border-red-500 focus:ring-red-500 sm:text-sm">
+                        </div>
+                        <div>
+                             <h3 class="font-medium text-gray-700 dark:text-gray-300 mb-2">3. Generate</h3>
+                            <button id="generateGroupsBtn" class="w-full bg-green-600 text-white font-semibold py-2 px-4 rounded-md hover:bg-green-700 transition">Generate Groups</button>
                         </div>
                     </div>
-                     <div id="group-generator-message-box" class="mt-6 text-center text-sm font-medium h-5"></div>
+                    <div class="lg:col-span-2 p-2 min-h-[400px] lg:min-h-[500px]">
+                        <h2 class="text-xl font-semibold mb-4 text-center">Generated Groups</h2>
+                        <div id="groupsResultContainer" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+                            <p class="text-gray-400 dark:text-gray-500 col-span-full text-center mt-8">Groups will appear here once generated.</p>
+                        </div>
+                    </div>
                 </div>
-            </main>
-            
-            <footer class="text-center text-sm text-gray-400 dark:text-gray-500 p-4 mt-4 border-t border-gray-200 dark:border-gray-700">
-                <p>© 2025 Teachers Best Friend. All Rights Reserved.</p>
-            </footer>
-        </div>
+                 <div id="group-generator-message-box" class="mt-6 text-center text-sm font-medium h-5"></div>
+            </div>
+        </main>
+        
+        <footer class="text-center text-sm text-gray-400 dark:text-gray-500 p-4 mt-4 border-t border-gray-200 dark:border-gray-700">
+            <p>© 2025 Teachers Best Friend. All Rights Reserved.</p>
+        </footer>
     </div>
     
     <!-- Help Modal -->
@@ -307,7 +294,7 @@
                                 <li><strong>Rotate Handle:</strong> Click and drag the handle below the item to rotate it in 15-degree increments.</li>
                             </ul>
                         </li>
-                        <li><strong>Saving/Loading:</strong> Name your layout, click "Save", and it will appear in the dropdown. You can load or delete saved layouts at any time. Your layouts are saved to the cloud, linked to your account.</li>
+                        <li><strong>Saving/Loading:</strong> Name your layout, click "Save", and it will appear in the dropdown. You can load or delete saved layouts at any time. Your layouts are saved in your browser.</li>
                         <li><strong>Importing Names:</strong> Click "Upload CSV" to quickly import a list of names from a CSV file. The file should contain names separated by commas or new lines.</li>
                     </ul>
                 </div>
@@ -323,106 +310,6 @@
         </div>
     </div>
 
-    <!-- Firebase SDKs -->
-    <script type="module">
-        // Import the functions you need from the SDKs you need
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-        import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged, signInWithCustomToken, signInAnonymously } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-        import { getFirestore, collection, doc, setDoc, getDoc, getDocs, deleteDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
-
-        // Your web app's Firebase configuration
-        // These are placeholder variables that will be replaced by the environment
-        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : { apiKey: "...", authDomain: "...", projectId: "..." };
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
-
-        // Initialize Firebase
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const db = getFirestore(app);
-
-        // --- AUTHENTICATION LOGIC ---
-        const authContainer = document.getElementById('auth-container');
-        const navContainer = document.getElementById('nav-container');
-        const loginPrompt = document.getElementById('login-prompt');
-        const mainContent = document.getElementById('main-content');
-        const loginBtn = document.getElementById('loginBtn');
-        const loginMessageBox = document.getElementById('login-message-box');
-        let currentUser = null;
-
-        // Sign in with Google
-        async function signInWithGoogle() {
-            const provider = new GoogleAuthProvider();
-            try {
-                loginMessageBox.innerHTML = ''; // Clear previous errors
-                await signInWithPopup(auth, provider);
-            } catch (error) {
-                console.error("Error signing in with Google", error);
-                if (error.code === 'auth/unauthorized-domain') {
-                    loginMessageBox.innerHTML = `<strong>Configuration Error:</strong> This app's domain is not authorized for login.<br>Please add <strong>${window.location.hostname}</strong> to the 'Authorized domains' list in your Firebase project's Authentication settings.`;
-                } else {
-                    loginMessageBox.textContent = 'An error occurred during login. Please check the console for details.';
-                }
-            }
-        }
-        
-        // Sign out
-        async function signOutUser() {
-            try {
-                await signOut(auth);
-            } catch (error) {
-                console.error("Error signing out", error);
-            }
-        }
-        
-        // Listen for auth state changes
-        onAuthStateChanged(auth, (user) => {
-            currentUser = user;
-            if (user && !user.isAnonymous) { // Only treat real users as logged in
-                // User is signed in
-                authContainer.innerHTML = `
-                    <div class="flex items-center space-x-2">
-                        <img src="${user.photoURL}" alt="User" class="w-8 h-8 rounded-full">
-                        <span class="text-sm font-medium text-gray-700 dark:text-gray-300 hidden sm:block">${user.displayName}</span>
-                        <button id="logoutBtn" class="bg-red-700 text-white font-semibold text-sm py-1.5 px-3 rounded-md transition hover:bg-red-800">Logout</button>
-                    </div>
-                `;
-                document.getElementById('logoutBtn').addEventListener('click', signOutUser);
-                loginPrompt.classList.add('hidden');
-                mainContent.classList.remove('hidden');
-                navContainer.classList.remove('hidden');
-                window.dispatchEvent(new CustomEvent('user-authenticated', { detail: { userId: user.uid } }));
-            } else {
-                // User is signed out or anonymous
-                authContainer.innerHTML = ''; 
-                loginPrompt.classList.remove('hidden');
-                mainContent.classList.add('hidden');
-                navContainer.classList.add('hidden');
-                window.dispatchEvent(new CustomEvent('user-signed-out'));
-            }
-        });
-
-        loginBtn.addEventListener('click', signInWithGoogle);
-
-        // Initial sign-in check using provided token or anonymously
-        (async () => {
-             if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-                try {
-                    await signInWithCustomToken(auth, __initial_auth_token);
-                } catch (e) {
-                    console.error("Custom token sign-in failed, trying anonymous.", e);
-                    await signInAnonymously(auth);
-                }
-            } else {
-                 await signInAnonymously(auth);
-            }
-        })();
-
-        // Make DB and Auth globally available for other scripts
-        window.db = db;
-        window.appId = appId;
-        window.getCurrentUser = () => currentUser;
-
-    </script>
     <script>
         // --- THEME & NAVIGATION ---
         const themeToggleBtn = document.getElementById('themeToggleBtn');
@@ -514,10 +401,13 @@
 
             function showMessage(message, isError = true) {
                 messageBox.textContent = message;
-                messageBox.className = 'mt-6 text-center text-sm font-medium min-h-[20px]'; // Reset
+                messageBox.className = 'mt-6 text-center text-sm font-medium h-5'; // Reset
                 messageBox.classList.add(isError ? 'text-red-600' : 'text-green-600', isError ? 'dark:text-red-500' : 'dark:text-green-500');
                 setTimeout(() => { messageBox.textContent = ''; }, 3000);
             }
+            
+            const getLayouts = () => JSON.parse(localStorage.getItem('seatingChartLayouts')) || {};
+            const saveLayouts = (layouts) => localStorage.setItem('seatingChartLayouts', JSON.stringify(layouts));
 
             function createDraggableElement(classes) {
                 const el = document.createElement('div');
@@ -805,108 +695,64 @@
                 });
             }
 
-            async function populateLayoutsDropdown() {
-                const user = window.getCurrentUser();
-                if (!user || user.isAnonymous) return;
-
-                const { getDocs, collection } = await import("https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js");
-                const layoutsRef = collection(window.db, 'artifacts', window.appId, 'users', user.uid, 'layouts');
-                const querySnapshot = await getDocs(layoutsRef);
-                
+            function populateLayoutsDropdown() {
+                const layouts = getLayouts();
                 layoutsDropdown.innerHTML = '<option value="">-- Select a Layout --</option>';
-                querySnapshot.forEach((doc) => {
+                Object.keys(layouts).forEach(name => {
                     const option = document.createElement('option');
-                    option.value = doc.id; 
-                    option.textContent = doc.id;
+                    option.value = name; option.textContent = name;
                     layoutsDropdown.appendChild(option);
                 });
             }
             
-            async function saveCurrentLayout() {
-                const user = window.getCurrentUser();
-                if (!user || user.isAnonymous) return showMessage('You must be logged in to save layouts.');
-
+            function saveCurrentLayout() {
                 const name = layoutNameInput.value.trim();
                 if (!name) return showMessage('Please enter a name for the layout.');
-                const layoutData = {
-                    items: Array.from(canvasContainer.querySelectorAll('.draggable')).map(el => {
-                        const data = { left: el.style.left, top: el.style.top, rotation: el.dataset.rotation || 0 };
-                        if (el.classList.contains('desk')) { data.itemClass = 'desk'; data.deskType = el.dataset.deskType; } 
-                        else { data.itemClass = 'component'; data.componentType = el.dataset.componentType; }
-                        return data;
-                    })
-                };
-
-                const { doc, setDoc } = await import("https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js");
-                const layoutRef = doc(window.db, 'artifacts', window.appId, 'users', user.uid, 'layouts', name);
-                
-                try {
-                    await setDoc(layoutRef, layoutData);
-                    showMessage(`Layout "${name}" saved to the cloud.`, false);
-                    await populateLayoutsDropdown();
-                    layoutsDropdown.value = name;
-                } catch (error) {
-                    console.error("Error saving layout: ", error);
-                    showMessage("Failed to save layout. Please try again.");
-                }
+                const layoutData = Array.from(canvasContainer.querySelectorAll('.draggable')).map(el => {
+                    const data = { left: el.style.left, top: el.style.top, rotation: el.dataset.rotation || 0 };
+                    if (el.classList.contains('desk')) { data.itemClass = 'desk'; data.deskType = el.dataset.deskType; } 
+                    else { data.itemClass = 'component'; data.componentType = el.dataset.componentType; }
+                    return data;
+                });
+                const layouts = getLayouts();
+                layouts[name] = layoutData;
+                saveLayouts(layouts);
+                showMessage(`Layout "${name}" saved.`, false);
+                populateLayoutsDropdown();
+                layoutsDropdown.value = name;
             }
 
-            async function loadSelectedLayout() {
-                const user = window.getCurrentUser();
-                if (!user || user.isAnonymous) return showMessage('You must be logged in to load layouts.');
-                
+            function loadSelectedLayout() {
                 const name = layoutsDropdown.value;
                 if (!name) return showMessage('Please select a layout to load.');
-                
-                const { doc, getDoc } = await import("https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js");
-                const layoutRef = doc(window.db, 'artifacts', window.appId, 'users', user.uid, 'layouts', name);
-                
-                try {
-                    const docSnap = await getDoc(layoutRef);
-                    if (docSnap.exists()) {
-                        const layoutData = docSnap.data().items || [];
-                        resetCanvas();
-                        if (layoutData.length === 0) return;
-                        canvasContainer.innerHTML = '';
-                        layoutData.forEach(itemInfo => {
-                            let element;
-                            const rotation = itemInfo.rotation || 0;
-                            if (itemInfo.itemClass === 'desk') element = createDeskElement(itemInfo.deskType, rotation);
-                            else if (itemInfo.itemClass === 'component') element = createRoomComponentElement(itemInfo.componentType, rotation);
-                            if (element) {
-                                addItemToCanvas(element, itemInfo.left, itemInfo.top);
-                            }
-                        });
-                        layoutNameInput.value = name;
-                        showMessage(`Layout "${name}" loaded.`, false);
-                    } else {
-                        showMessage(`Layout "${name}" not found.`);
+                const layoutData = getLayouts()[name];
+                if (!layoutData) return showMessage(`Layout "${name}" not found.`);
+                resetCanvas();
+                if (layoutData.length === 0) return;
+                canvasContainer.innerHTML = '';
+                layoutData.forEach(itemInfo => {
+                    let element;
+                    const rotation = itemInfo.rotation || 0;
+                    if (itemInfo.itemClass === 'desk') element = createDeskElement(itemInfo.deskType, rotation);
+                    else if (itemInfo.itemClass === 'component') element = createRoomComponentElement(itemInfo.componentType, rotation);
+                    if (element) {
+                        addItemToCanvas(element, itemInfo.left, itemInfo.top);
                     }
-                } catch(error) {
-                    console.error("Error loading layout: ", error);
-                    showMessage("Failed to load layout. Please try again.");
-                }
+                });
+                layoutNameInput.value = name;
+                showMessage(`Layout "${name}" loaded.`, false);
             }
 
-            async function deleteSelectedLayout() {
-                const user = window.getCurrentUser();
-                if (!user || user.isAnonymous) return showMessage('You must be logged in to delete layouts.');
-
+            function deleteSelectedLayout() {
                 const name = layoutsDropdown.value;
                 if (!name) return showMessage('Please select a layout to delete.');
-                
-                const { doc, deleteDoc } = await import("https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js");
-                const layoutRef = doc(window.db, 'artifacts', window.appId, 'users', user.uid, 'layouts', name);
-
-                try {
-                    await deleteDoc(layoutRef);
-                    showMessage(`Layout "${name}" deleted.`, false);
-                    await populateLayoutsDropdown();
-                    layoutNameInput.value = '';
-                } catch (error) {
-                    console.error("Error deleting layout: ", error);
-                    showMessage("Failed to delete layout. Please try again.");
-                }
+                const layouts = getLayouts();
+                if (!layouts[name]) return showMessage(`Layout "${name}" not found.`);
+                delete layouts[name];
+                saveLayouts(layouts);
+                showMessage(`Layout "${name}" deleted.`, false);
+                populateLayoutsDropdown();
+                layoutNameInput.value = '';
             }
 
             function handleFileUpload(event) {
@@ -934,14 +780,8 @@
             loadLayoutBtn.addEventListener('click', loadSelectedLayout);
             deleteLayoutBtn.addEventListener('click', deleteSelectedLayout);
             
-            // Listen for auth events
-            window.addEventListener('user-authenticated', () => {
-                populateLayoutsDropdown();
-            });
-            window.addEventListener('user-signed-out', () => {
-                resetCanvas();
-                layoutsDropdown.innerHTML = '<option value="">-- Select a Layout --</option>';
-            });
+            // Initial population
+            populateLayoutsDropdown();
         })();
 
         // --- GROUP GENERATOR LOGIC ---
