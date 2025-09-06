@@ -115,8 +115,26 @@
             opacity: 1;
         }
 
+        /* Timer Specific Styles */
+        #digital-clock { font-size: 2rem; font-weight: 600; letter-spacing: 0.05em; }
+        #analog-timer { width: 300px; height: 300px; }
+        #analog-timer-container.hidden, #digital-timer-container.hidden { display: none; }
+        #timer-digital-display { font-size: 5rem; font-weight: 700; }
+        #timer-progress-ring {
+            transform-origin: center;
+            transform: rotate(-90deg);
+            transition: stroke-dashoffset 0.3s linear;
+        }
+        #youtube-player-container.video-hidden {
+            position: absolute;
+            left: -9999px;
+            width: 1px;
+            height: 1px;
+        }
+
+
         /* General Styles */
-        .nav-btn.active {
+        .nav-btn.active, .timer-view-btn.active {
             background-color: #C53030; /* red-700 */
             color: white;
         }
@@ -154,6 +172,7 @@
             <div id="nav-container" class="flex items-center space-x-2 bg-gray-100 dark:bg-gray-900 p-1 rounded-lg">
                 <button id="navSeatingChart" class="nav-btn px-3 py-1.5 text-sm font-semibold rounded-md transition">Seating Chart</button>
                 <button id="navGroupGenerator" class="nav-btn px-3 py-1.5 text-sm font-semibold rounded-md transition">Group Generator</button>
+                <button id="navTimer" class="nav-btn px-3 py-1.5 text-sm font-semibold rounded-md transition">Timer</button>
             </div>
             <div class="flex items-center space-x-1">
                 <button id="themeToggleBtn" class="p-2 rounded-full text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none">
@@ -253,11 +272,11 @@
                                <label for="groupCsvFileInput" class="text-sm bg-gray-200 hover:bg-gray-300 text-gray-700 dark:bg-gray-600 dark:hover:bg-gray-500 dark:text-gray-200 font-semibold py-1 px-3 rounded-md cursor-pointer transition">Upload CSV</label>
                                <input type="file" id="groupCsvFileInput" class="hidden" accept=".csv">
                            </div>
-                           <textarea id="groupNames" rows="10" class="block w-full rounded-md border-gray-300 dark:border-gray-500 bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-200 dark:placeholder-gray-400 shadow-sm focus:border-red-500 focus:ring-red-500 sm:text-sm" placeholder="Enter names, one per line..."></textarea>
+                           <textarea id="groupNames" rows="10" class="block w-full rounded-md border-gray-300 dark:border-gray-500 bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-200 dark:placeholder-gray-400 shadow-sm focus:border-red-500 focus:ring-red-500 sm:text-sm px-3 py-2" placeholder="Enter names, one per line..."></textarea>
                         </div>
                         <div class="mb-6">
                             <h3 class="font-medium text-gray-700 dark:text-gray-300 mb-2">2. Set Number of Groups</h3>
-                            <input type="number" id="numGroups" min="1" value="2" class="block w-full rounded-md border-gray-300 dark:border-gray-500 bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-200 dark:placeholder-gray-400 shadow-sm focus:border-red-500 focus:ring-red-500 sm:text-sm">
+                            <input type="number" id="numGroups" min="1" value="2" class="block w-full rounded-md border-gray-300 dark:border-gray-500 bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-200 dark:placeholder-gray-400 shadow-sm focus:border-red-500 focus:ring-red-500 sm:text-sm px-3 py-2">
                         </div>
                         <div>
                              <h3 class="font-medium text-gray-700 dark:text-gray-300 mb-2">3. Generate</h3>
@@ -272,6 +291,67 @@
                     </div>
                 </div>
                  <div id="group-generator-message-box" class="mt-6 text-center text-sm font-medium h-5"></div>
+            </div>
+
+            <!-- Timer Page -->
+            <div id="page-timer" class="page">
+                 <header class="text-center mb-8">
+                    <h1 class="text-3xl md:text-4xl font-bold text-gray-800 dark:text-gray-100">Classroom Timer</h1>
+                    <p class="text-gray-500 dark:text-gray-400 mt-2">A simple timer with focus music to keep your class on track.</p>
+                </header>
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
+                    <!-- Left Column: Timer Controls -->
+                    <div class="bg-gray-50 dark:bg-gray-700/50 p-6 rounded-lg border border-gray-200 dark:border-gray-600 flex flex-col items-center space-y-6">
+                         <div class="w-full text-center">
+                            <h2 class="text-xl font-semibold mb-2">Set Timer</h2>
+                            <div class="flex items-center justify-center space-x-2">
+                                <input type="number" id="timer-minutes" min="1" placeholder="Minutes" class="block w-28 rounded-md border-gray-300 dark:border-gray-500 bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-200 shadow-sm focus:border-red-500 focus:ring-red-500 sm:text-sm px-3 py-2">
+                                <button id="set-timer-btn" class="bg-red-700 text-white font-semibold py-2 px-4 rounded-md transition hover:bg-red-800">Set</button>
+                            </div>
+                         </div>
+                         <div class="w-full text-center">
+                             <h2 class="text-xl font-semibold mb-2">Display</h2>
+                             <div class="flex justify-center space-x-2 bg-gray-200 dark:bg-gray-900 p-1 rounded-lg">
+                                 <button id="timerAnalogViewBtn" class="timer-view-btn px-3 py-1 text-sm font-semibold rounded-md">Analog</button>
+                                 <button id="timerDigitalViewBtn" class="timer-view-btn px-3 py-1 text-sm font-semibold rounded-md">Digital</button>
+                                 <button id="timerBothViewBtn" class="timer-view-btn px-3 py-1 text-sm font-semibold rounded-md">Both</button>
+                             </div>
+                         </div>
+                         <div class="w-full flex justify-center space-x-4">
+                            <button id="start-pause-timer-btn" class="bg-green-600 text-white font-semibold py-2 px-8 rounded-md hover:bg-green-700 transition">Start</button>
+                            <button id="reset-timer-btn" class="bg-yellow-500 text-white font-semibold py-2 px-8 rounded-md hover:bg-yellow-600 transition">Reset</button>
+                        </div>
+                        <div class="w-full text-center border-t border-gray-200 dark:border-gray-600 pt-6">
+                             <h2 class="text-xl font-semibold mb-2">Focus Music (YouTube)</h2>
+                             <div class="flex items-center justify-center space-x-2 mb-2">
+                                <input type="text" id="youtube-url" placeholder="Paste YouTube video URL here..." class="block w-full rounded-md border-gray-300 dark:border-gray-500 bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-200 shadow-sm focus:border-red-500 focus:ring-red-500 sm:text-sm px-3 py-2">
+                                <button id="load-video-btn" class="bg-gray-500 text-white font-semibold py-2 px-4 rounded-md transition hover:bg-gray-600 flex-shrink-0">Load</button>
+                             </div>
+                             <button id="toggle-video-btn" class="hidden bg-gray-600 text-white font-semibold py-2 px-4 rounded-md transition hover:bg-gray-700 mt-2">Hide Video</button>
+                        </div>
+                        <div id="youtube-player-container" class="w-full aspect-video hidden">
+                            <div id="youtube-player"></div>
+                        </div>
+                         <div class="w-full text-center border-t border-gray-200 dark:border-gray-600 pt-6">
+                             <h2 class="text-xl font-semibold mb-2">Current Time</h2>
+                             <p id="digital-clock" class="text-gray-800 dark:text-gray-200">00:00:00</p>
+                         </div>
+                    </div>
+                    <!-- Right Column: Timer Display -->
+                    <div class="bg-gray-50 dark:bg-gray-700/50 p-6 rounded-lg border border-gray-200 dark:border-gray-600 flex flex-col items-center justify-center min-h-[460px] space-y-4">
+                        <div id="timer-display-container" class="flex flex-col items-center justify-center w-full space-y-4">
+                            <div id="analog-timer-container">
+                                <svg id="analog-timer" viewBox="0 0 200 200">
+                                    <circle class="stroke-gray-300 dark:stroke-gray-600" cx="100" cy="100" r="90" stroke-width="12" fill="transparent"/>
+                                    <circle id="timer-progress-ring" class="stroke-red-600" cx="100" cy="100" r="90" stroke-width="12" fill="transparent" stroke-linecap="round"/>
+                                </svg>
+                            </div>
+                            <div id="digital-timer-container">
+                                <p id="timer-digital-display" class="text-gray-800 dark:text-gray-200">00:00</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </main>
         
@@ -315,10 +395,20 @@
                         <li><strong>Generate:</strong> Click "Generate Groups" to randomly and evenly distribute the names into the specified number of groups.</li>
                     </ul>
                 </div>
+                 <div>
+                    <h3 class="font-semibold text-lg mb-2 text-gray-800 dark:text-gray-200 border-b border-gray-200 dark:border-gray-600 pb-2">Classroom Timer</h3>
+                    <ul class="list-disc list-inside space-y-2 text-gray-600 dark:text-gray-400">
+                        <li><strong>Set a Timer:</strong> Enter the number of minutes and click "Set".</li>
+                        <li><strong>Display Mode:</strong> After setting a timer, choose your preferred view: Analog, Digital, or Both.</li>
+                        <li><strong>Controls:</strong> Use the "Start", "Pause", and "Reset" buttons to control the countdown.</li>
+                        <li><strong>Focus Music:</strong> Paste a YouTube video URL and click "Load". After loading, you can use the "Hide/Show Video" button to toggle the video display while keeping the audio.</li>
+                    </ul>
+                </div>
             </div>
         </div>
     </div>
 
+    <script src="https://www.youtube.com/iframe_api"></script>
     <script>
         // --- THEME & NAVIGATION ---
         const themeToggleBtn = document.getElementById('themeToggleBtn');
@@ -326,8 +416,10 @@
         const themeIconDark = document.getElementById('theme-icon-dark');
         const navSeatingChart = document.getElementById('navSeatingChart');
         const navGroupGenerator = document.getElementById('navGroupGenerator');
+        const navTimer = document.getElementById('navTimer');
         const pageSeatingChart = document.getElementById('page-seating-chart');
         const pageGroupGenerator = document.getElementById('page-group-generator');
+        const pageTimer = document.getElementById('page-timer');
         const helpBtn = document.getElementById('helpBtn');
         const helpModal = document.getElementById('helpModal');
         const closeHelpModalBtn = document.getElementById('closeHelpModalBtn');
@@ -350,15 +442,20 @@
         function switchPage(page) {
             pageSeatingChart.classList.remove('active');
             pageGroupGenerator.classList.remove('active');
+            pageTimer.classList.remove('active');
             navSeatingChart.classList.remove('active');
             navGroupGenerator.classList.remove('active');
+            navTimer.classList.remove('active');
 
             if (page === 'seatingChart') {
                 pageSeatingChart.classList.add('active');
                 navSeatingChart.classList.add('active');
-            } else {
+            } else if (page === 'groupGenerator') {
                 pageGroupGenerator.classList.add('active');
                 navGroupGenerator.classList.add('active');
+            } else if (page === 'timer') {
+                pageTimer.classList.add('active');
+                navTimer.classList.add('active');
             }
         }
 
@@ -370,6 +467,7 @@
         
         navSeatingChart.addEventListener('click', () => switchPage('seatingChart'));
         navGroupGenerator.addEventListener('click', () => switchPage('groupGenerator'));
+        navTimer.addEventListener('click', () => switchPage('timer'));
         
         // Help Modal Logic
         helpBtn.addEventListener('click', () => helpModal.classList.remove('hidden'));
@@ -432,7 +530,7 @@
                 
                 const deleteBtn = document.createElement('div');
                 deleteBtn.className = 'delete-btn bg-red-600 text-white hover:bg-red-700';
-                deleteBtn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="currentColor" viewBox="0 0 16 16"><path d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708 .708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z"/></svg>`;
+                deleteBtn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="currentColor" viewBox="0 0 16 16"><path d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708 .708L8.707 8l2.647 2.646a.5.5 0 0 1-.708 .708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z"/></svg>`;
                 deleteBtn.title = "Delete Item";
                 deleteBtn.addEventListener('click', (e) => {
                     e.stopPropagation();
@@ -609,7 +707,7 @@
                 document.addEventListener('mousemove', doRotation);
                 document.addEventListener('mouseup', stopRotation);
                 document.addEventListener('touchmove', doRotation);
-                document.removeEventListener('touchend', stopRotation);
+                document.addEventListener('touchend', stopRotation);
             }
 
             function getVisualBoundingBox(element) {
@@ -873,6 +971,199 @@
             generateGroupsBtn.addEventListener('click', generateGroups);
             groupCsvFileInput.addEventListener('change', handleGroupFileUpload);
         })();
+        
+        // --- TIMER LOGIC ---
+        (function() {
+            if (!document.getElementById('page-timer')) return;
+            // Clock elements
+            const digitalClock = document.getElementById('digital-clock');
+            const timerProgressRing = document.getElementById('timer-progress-ring');
+            const radius = timerProgressRing.r.baseVal.value;
+            const circumference = 2 * Math.PI * radius;
+            timerProgressRing.style.strokeDasharray = `${circumference} ${circumference}`;
+            timerProgressRing.style.strokeDashoffset = circumference;
+
+
+            // Timer elements
+            const timerMinutesInput = document.getElementById('timer-minutes');
+            const setTimerBtn = document.getElementById('set-timer-btn');
+            const startPauseBtn = document.getElementById('start-pause-timer-btn');
+            const resetTimerBtn = document.getElementById('reset-timer-btn');
+            
+            // Timer Display elements
+            const timerAnalogContainer = document.getElementById('analog-timer-container');
+            const timerDigitalContainer = document.getElementById('digital-timer-container');
+            const timerDigitalDisplay = document.getElementById('timer-digital-display');
+            const timerAnalogViewBtn = document.getElementById('timerAnalogViewBtn');
+            const timerDigitalViewBtn = document.getElementById('timerDigitalViewBtn');
+            const timerBothViewBtn = document.getElementById('timerBothViewBtn');
+
+            // YouTube elements
+            const youtubeUrlInput = document.getElementById('youtube-url');
+            const loadVideoBtn = document.getElementById('load-video-btn');
+            const youtubePlayerContainer = document.getElementById('youtube-player-container');
+            const toggleVideoBtn = document.getElementById('toggle-video-btn');
+            let ytPlayer;
+
+            let timerInterval;
+            let timeRemaining = 0;
+            let totalTime = 0;
+            let isTimerRunning = false;
+            
+            let alarmContext, alarmGain;
+            
+             // YouTube Player Logic
+            window.onYouTubeIframeAPIReady = function() {
+                // This function is called automatically when the YouTube IFrame Player API code downloads.
+            };
+
+            function extractVideoID(url) {
+                const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+                const match = url.match(regExp);
+                return (match && match[2].length === 11) ? match[2] : null;
+            }
+
+            function loadVideo() {
+                const videoUrl = youtubeUrlInput.value.trim();
+                if (!videoUrl) return;
+                const videoId = extractVideoID(videoUrl);
+
+                if (!videoId) {
+                    alert("Please enter a valid YouTube video URL.");
+                    return;
+                }
+                
+                youtubePlayerContainer.classList.remove('hidden', 'video-hidden');
+                toggleVideoBtn.classList.remove('hidden');
+                toggleVideoBtn.textContent = 'Hide Video';
+
+                if (ytPlayer) {
+                    ytPlayer.loadVideoById(videoId);
+                } else {
+                    ytPlayer = new YT.Player('youtube-player', {
+                        height: '100%',
+                        width: '100%',
+                        videoId: videoId,
+                        playerVars: { 'playsinline': 1, 'controls': 1 }
+                    });
+                }
+            }
+
+            // Clock Logic
+            function updateDigitalClock() {
+                if(digitalClock) digitalClock.textContent = new Date().toLocaleTimeString();
+            }
+            
+            // Timer Logic
+            function updateTimerDisplays(seconds) {
+                // Digital
+                const mins = Math.floor(seconds / 60);
+                const secs = seconds % 60;
+                timerDigitalDisplay.textContent = `${mins < 10 ? '0' : ''}${mins}:${secs < 10 ? '0' : ''}${secs}`;
+
+                // Analog progress ring
+                const progress = totalTime > 0 ? (totalTime - seconds) / totalTime : 0;
+                const offset = circumference * (1 - progress);
+                timerProgressRing.style.strokeDashoffset = offset;
+            }
+
+            function setTimer() {
+                clearInterval(timerInterval);
+                isTimerRunning = false;
+                startPauseBtn.textContent = 'Start';
+                const minutes = parseInt(timerMinutesInput.value, 10);
+                if (isNaN(minutes) || minutes <= 0) {
+                    timeRemaining = 0;
+                    totalTime = 0;
+                } else {
+                    timeRemaining = minutes * 60;
+                    totalTime = minutes * 60;
+                }
+                updateTimerDisplays(timeRemaining);
+            }
+
+            function startPauseTimer() {
+                if (totalTime <= 0) return;
+                isTimerRunning = !isTimerRunning;
+                if (isTimerRunning) {
+                    startPauseBtn.textContent = 'Pause';
+                    timerInterval = setInterval(() => {
+                        timeRemaining--;
+                        updateTimerDisplays(timeRemaining);
+                        if (timeRemaining <= 0) {
+                            clearInterval(timerInterval);
+                            playAlarm();
+                            startPauseBtn.textContent = 'Start';
+                            isTimerRunning = false;
+                        }
+                    }, 1000);
+                } else {
+                    startPauseBtn.textContent = 'Start';
+                    clearInterval(timerInterval);
+                }
+            }
+
+            function resetTimer() {
+                 clearInterval(timerInterval);
+                 isTimerRunning = false;
+                 startPauseBtn.textContent = 'Start';
+                 timeRemaining = totalTime;
+                 updateTimerDisplays(timeRemaining);
+            }
+
+            function switchTimerView(view) {
+                // Handle button active states
+                [timerAnalogViewBtn, timerDigitalViewBtn, timerBothViewBtn].forEach(btn => btn.classList.remove('active'));
+                if (view === 'analog') timerAnalogViewBtn.classList.add('active');
+                if (view === 'digital') timerDigitalViewBtn.classList.add('active');
+                if (view === 'both') timerBothViewBtn.classList.add('active');
+
+                // Handle container visibility
+                const showAnalog = view === 'analog' || view === 'both';
+                const showDigital = view === 'digital' || view === 'both';
+
+                timerAnalogContainer.classList.toggle('hidden', !showAnalog);
+                timerDigitalContainer.classList.toggle('hidden', !showDigital);
+            }
+            
+            // Sound Logic
+            function playAlarm() {
+                if (!alarmContext) {
+                     alarmContext = new (window.AudioContext || window.webkitAudioContext)();
+                }
+                alarmGain = alarmContext.createGain();
+                alarmGain.connect(alarmContext.destination);
+                alarmGain.gain.setValueAtTime(0.5, alarmContext.currentTime);
+                
+                const alarmOsc = alarmContext.createOscillator();
+                alarmOsc.connect(alarmGain);
+                alarmOsc.type = 'triangle';
+                alarmOsc.frequency.setValueAtTime(880, alarmContext.currentTime); // A5
+                alarmOsc.start();
+                setTimeout(() => alarmOsc.stop(), 500);
+            }
+            
+            // Event Listeners
+            setTimerBtn.addEventListener('click', setTimer);
+            startPauseBtn.addEventListener('click', startPauseTimer);
+            resetTimerBtn.addEventListener('click', resetTimer);
+            
+            timerAnalogViewBtn.addEventListener('click', () => switchTimerView('analog'));
+            timerDigitalViewBtn.addEventListener('click', () => switchTimerView('digital'));
+            timerBothViewBtn.addEventListener('click', () => switchTimerView('both'));
+
+            loadVideoBtn.addEventListener('click', loadVideo);
+
+            toggleVideoBtn.addEventListener('click', () => {
+                const isNowHidden = youtubePlayerContainer.classList.toggle('video-hidden');
+                toggleVideoBtn.textContent = isNowHidden ? 'Show Video' : 'Hide Video';
+            });
+            
+            // Initial setup
+            setInterval(updateDigitalClock, 1000);
+            updateDigitalClock();
+            switchTimerView('digital'); // Default timer view
+        })();
 
 
         // --- INITIALIZATION ---
@@ -885,5 +1176,4 @@
     </script>
 </body>
 </html>
-
 
