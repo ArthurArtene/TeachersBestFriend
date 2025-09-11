@@ -64,6 +64,41 @@
             padding: 0 2px;
         }
         .desk.double > .desk-name { width: 50%; }
+        
+        .harkness-table {
+            width: 420px;
+            height: 280px;
+        }
+        .harkness-table-oval {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            position: absolute;
+            background-color: #A0522D; /* sienna */
+            border: 10px solid #8B4513; /* saddlebrown */
+            z-index: -1;
+        }
+        .dark .harkness-table-oval {
+            background-color: #804A22;
+            border-color: #6A3811;
+        }
+
+        .harkness-seat {
+            position: absolute;
+            width: 60px;
+            height: 45px;
+            background-color: #D2B48C; /* tan */
+            border: 1px solid #8B4513;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .dark .harkness-seat {
+            background-color: #B59873;
+            border-color: #6A3811;
+        }
+
         .room-component {
             display: flex;
             align-items: center;
@@ -199,10 +234,11 @@
                             <!-- Column 1: Add Desks -->
                             <div class="mb-6 md:mb-0">
                                 <h3 class="font-medium text-gray-700 dark:text-gray-300 mb-2">1. Add Desks</h3>
-                                <p class="text-sm text-gray-500 dark:text-gray-400 mb-2">Click icons on desks to align, delete, or rotate (snaps to 15°).</p>
+                                <p class="text-sm text-gray-500 dark:text-gray-400 mb-2">Click icons on items to align, delete, or rotate (snaps to 15°).</p>
                                 <div class="flex flex-col space-y-2">
                                      <button id="singleDeskBtn" class="w-full bg-red-700 text-white font-semibold py-2 px-4 rounded-md transition hover:bg-red-800">Add Single Desk</button>
                                      <button id="doubleDeskBtn" class="w-full bg-red-700 text-white font-semibold py-2 px-4 rounded-md transition hover:bg-red-800">Add Double Desk</button>
+                                     <button id="addHarknessBtn" class="w-full bg-red-700 text-white font-semibold py-2 px-4 rounded-md transition hover:bg-red-800 mt-4">Add Harkness Table</button>
                                 </div>
                             </div>
                             <!-- Column 2: Add Room Components -->
@@ -250,8 +286,16 @@
                             </div>
                         </div>
                     </div>
-                    <div id="canvas-container" class="w-full bg-gray-50 dark:bg-gray-900/50 p-2 rounded-lg border border-gray-200 dark:border-gray-600 flex items-center justify-center min-h-[600px]">
-                         <p class="text-gray-400 dark:text-gray-500">Add desks to get started.</p>
+                    <div class="flex flex-col">
+                        <div class="w-full bg-gray-200 dark:bg-gray-700 text-center py-2 rounded-t-lg border-b-2 border-gray-300 dark:border-gray-600">
+                            <p class="font-semibold text-gray-600 dark:text-gray-300 tracking-widest uppercase text-sm">Front of Room</p>
+                        </div>
+                        <div id="canvas-container" class="w-full bg-gray-50 dark:bg-gray-900/50 p-2 border-l border-r border-b border-gray-200 dark:border-gray-600 flex items-center justify-center min-h-[600px]">
+                            <p class="text-gray-400 dark:text-gray-500">Add desks to get started.</p>
+                        </div>
+                        <div id="resize-handle" class="w-full h-4 bg-gray-200 dark:bg-gray-700 cursor-ns-resize rounded-b-lg flex items-center justify-center border border-t-0 border-gray-200 dark:border-gray-600">
+                            <div class="w-8 h-1 bg-gray-400 dark:bg-gray-500 rounded-full"></div>
+                        </div>
                     </div>
                 </div>
                 <div id="seating-chart-message-box" class="mt-6 text-center text-sm font-medium h-5"></div>
@@ -261,7 +305,7 @@
             <div id="page-group-generator" class="page">
                 <header class="text-center mb-8">
                     <h1 class="text-3xl md:text-4xl font-bold text-gray-800 dark:text-gray-100">Random Group Generator</h1>
-                    <p class="text-gray-500 dark:text-gray-400 mt-2">Randomly assign students into groups.</p>
+                    <p class="text-gray-500 dark:text-gray-400 mt-2">Randomly assign students into unique sets of groups.</p>
                 </header>
                 <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
                     <div class="lg:col-span-1 bg-gray-50 dark:bg-gray-700/50 p-6 rounded-lg border border-gray-200 dark:border-gray-600">
@@ -278,14 +322,18 @@
                             <h3 class="font-medium text-gray-700 dark:text-gray-300 mb-2">2. Set Number of Groups</h3>
                             <input type="number" id="numGroups" min="1" value="2" class="block w-full rounded-md border-gray-300 dark:border-gray-500 bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-200 dark:placeholder-gray-400 shadow-sm focus:border-red-500 focus:ring-red-500 sm:text-sm px-3 py-2">
                         </div>
+                        <div class="mb-6">
+                            <h3 class="font-medium text-gray-700 dark:text-gray-300 mb-2">3. Set Number of Sets</h3>
+                            <input type="number" id="numSets" min="1" value="1" class="block w-full rounded-md border-gray-300 dark:border-gray-500 bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-200 dark:placeholder-gray-400 shadow-sm focus:border-red-500 focus:ring-red-500 sm:text-sm px-3 py-2">
+                        </div>
                         <div>
-                             <h3 class="font-medium text-gray-700 dark:text-gray-300 mb-2">3. Generate</h3>
+                             <h3 class="font-medium text-gray-700 dark:text-gray-300 mb-2">4. Generate</h3>
                             <button id="generateGroupsBtn" class="w-full bg-green-600 text-white font-semibold py-2 px-4 rounded-md hover:bg-green-700 transition">Generate Groups</button>
                         </div>
                     </div>
                     <div class="lg:col-span-2 p-2 min-h-[400px] lg:min-h-[500px]">
                         <h2 class="text-xl font-semibold mb-4 text-center">Generated Groups</h2>
-                        <div id="groupsResultContainer" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+                        <div id="groupsResultContainer" class="space-y-8">
                             <p class="text-gray-400 dark:text-gray-500 col-span-full text-center mt-8">Groups will appear here once generated.</p>
                         </div>
                     </div>
@@ -385,6 +433,7 @@
                         </li>
                         <li><strong>Saving/Loading:</strong> Name your layout, click "Save", and it will appear in the dropdown. You can load or delete saved layouts at any time. Your layouts are saved in your browser.</li>
                         <li><strong>Importing Names:</strong> Click "Upload CSV" to quickly import a list of names from a CSV file. The file should contain names separated by commas or new lines.</li>
+                        <li><strong>Harkness Table:</strong> Select a number of seats and click "Add Harkness Table" to add a large, collaborative table to your layout.</li>
                     </ul>
                 </div>
                 <div>
@@ -404,6 +453,26 @@
                         <li><strong>Focus Music:</strong> Paste a YouTube video URL and click "Load". After loading, you can use the "Hide/Show Video" button to toggle the video display while keeping the audio.</li>
                     </ul>
                 </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Harkness Table Modal -->
+    <div id="harknessModal" class="modal hidden">
+        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-xl w-full max-w-xs m-4">
+            <div class="flex justify-between items-center p-4 border-b border-gray-200 dark:border-gray-700">
+                <h2 class="text-lg font-bold">Configure Harkness Table</h2>
+                <button id="closeHarknessModalBtn" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 text-2xl font-bold">&times;</button>
+            </div>
+            <div class="p-6 space-y-4">
+                <div>
+                    <label for="harknessSeatsInputModal" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Number of Seats (4-20):</label>
+                    <input type="number" id="harknessSeatsInputModal" min="4" max="20" value="12" class="block w-full rounded-md border-gray-300 dark:border-gray-500 bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-200 shadow-sm focus:border-red-500 focus:ring-red-500 sm:text-sm px-3 py-2">
+                </div>
+            </div>
+            <div class="flex justify-end p-4 bg-gray-50 dark:bg-gray-700/50 rounded-b-lg space-x-2">
+                <button id="cancelHarknessBtn" class="bg-gray-200 hover:bg-gray-300 text-gray-700 dark:bg-gray-600 dark:hover:bg-gray-500 dark:text-gray-200 font-semibold py-2 px-4 rounded-md transition text-sm">Cancel</button>
+                <button id="confirmAddHarknessBtn" class="bg-red-700 text-white font-semibold py-2 px-4 rounded-md transition hover:bg-red-800 text-sm">Add Table</button>
             </div>
         </div>
     </div>
@@ -440,12 +509,10 @@
         }
 
         function switchPage(page) {
-            pageSeatingChart.classList.remove('active');
-            pageGroupGenerator.classList.remove('active');
-            pageTimer.classList.remove('active');
-            navSeatingChart.classList.remove('active');
-            navGroupGenerator.classList.remove('active');
-            navTimer.classList.remove('active');
+            const pages = [pageSeatingChart, pageGroupGenerator, pageTimer];
+            const navs = [navSeatingChart, navGroupGenerator, navTimer];
+            pages.forEach(p => p.classList.remove('active'));
+            navs.forEach(n => n.classList.remove('active'));
 
             if (page === 'seatingChart') {
                 pageSeatingChart.classList.add('active');
@@ -483,8 +550,10 @@
             const canvasContainer = document.getElementById('canvas-container');
             if (!canvasContainer) return;
 
+            const resizeHandle = document.getElementById('resize-handle');
             const singleDeskBtn = document.getElementById('singleDeskBtn');
             const doubleDeskBtn = document.getElementById('doubleDeskBtn');
+            const addHarknessBtn = document.getElementById('addHarknessBtn');
             const roomComponentSelect = document.getElementById('roomComponentSelect');
             const addComponentBtn = document.getElementById('addComponentBtn');
             const namesInput = document.getElementById('names');
@@ -498,12 +567,20 @@
             const layoutsDropdown = document.getElementById('layoutsDropdown');
             const loadLayoutBtn = document.getElementById('loadLayoutBtn');
             const deleteLayoutBtn = document.getElementById('deleteLayoutBtn');
+            
+            // Harkness Modal elements
+            const harknessModal = document.getElementById('harknessModal');
+            const closeHarknessModalBtn = document.getElementById('closeHarknessModalBtn');
+            const cancelHarknessBtn = document.getElementById('cancelHarknessBtn');
+            const confirmAddHarknessBtn = document.getElementById('confirmAddHarknessBtn');
+            const harknessSeatsInputModal = document.getElementById('harknessSeatsInputModal');
 
             const gridSize = 20;
             let activeDraggable = null;
             let isDragging = false;
             let isRotating = false;
             let itemCounter = 0;
+            let seatCounter = 0; // For unique seat IDs
             let dragStartOffset = { x: 0, y: 0 };
 
             function showMessage(message, isError = true) {
@@ -515,10 +592,11 @@
             
             const getLayouts = () => JSON.parse(localStorage.getItem('seatingChartLayouts')) || {};
             const saveLayouts = (layouts) => localStorage.setItem('seatingChartLayouts', JSON.stringify(layouts));
+            
 
             function createDraggableElement(classes) {
                 const el = document.createElement('div');
-                el.className = 'p-1 bg-white dark:bg-gray-600 border border-gray-300 dark:border-gray-500 rounded-md draggable ' + classes;
+                el.className = 'p-1 bg-transparent border-none draggable ' + classes;
                 el.dataset.rotation = "0";
 
                 const rotateHandle = document.createElement('div');
@@ -565,21 +643,68 @@
             function createDeskElement(type, rotation = 0) {
                 const capacity = type === 'single' ? 1 : 2;
                 const desk = createDraggableElement(`desk ${type === 'double' ? 'double' : ''}`);
+                desk.classList.add('p-1', 'bg-white', 'dark:bg-gray-600', 'border', 'border-gray-300', 'dark:border-gray-500', 'rounded-md');
+                desk.dataset.itemType = 'desk';
                 desk.dataset.deskType = type;
                 desk.dataset.capacity = capacity;
                 for (let i = 0; i < capacity; i++) {
                     const nameSpan = document.createElement('span');
                     nameSpan.className = 'desk-name text-gray-500 dark:text-gray-300';
                     nameSpan.textContent = `Seat ${i + 1}`;
+                    nameSpan.id = `seat-${seatCounter++}`;
                     desk.appendChild(nameSpan);
                 }
                 desk.style.transform = `rotate(${rotation}deg)`;
                 desk.dataset.rotation = rotation;
                 return desk;
             }
+            
+            function createHarknessTableElement(numSeats, rotation = 0) {
+                const table = createDraggableElement('harkness-table');
+                table.dataset.itemType = 'harkness';
+                table.dataset.numSeats = numSeats;
+
+                const oval = document.createElement('div');
+                oval.className = 'harkness-table-oval';
+                table.appendChild(oval);
+
+                const tableWidth = 420;
+                const tableHeight = 280;
+                const radiusX = tableWidth / 2 - 35; 
+                const radiusY = tableHeight / 2 - 25; 
+
+                for (let i = 0; i < numSeats; i++) {
+                    const angle = (i / numSeats) * 2 * Math.PI;
+                    const seat = document.createElement('div');
+                    seat.className = 'harkness-seat';
+                    
+                    const seatWidth = 60;
+                    const seatHeight = 45;
+                    
+                    const seatX = (tableWidth / 2) + (radiusX * Math.cos(angle)) - (seatWidth / 2);
+                    const seatY = (tableHeight / 2) + (radiusY * Math.sin(angle)) - (seatHeight / 2);
+                    
+                    seat.style.left = `${seatX}px`;
+                    seat.style.top = `${seatY}px`;
+
+                    const nameSpan = document.createElement('span');
+                    nameSpan.className = 'desk-name text-gray-500 dark:text-gray-300';
+                    nameSpan.textContent = `Seat ${i + 1}`;
+                    nameSpan.id = `seat-${seatCounter++}`;
+                    seat.appendChild(nameSpan);
+                    table.appendChild(seat);
+                }
+                
+                table.style.transform = `rotate(${rotation}deg)`;
+                table.dataset.rotation = rotation;
+
+                return table;
+            }
 
             function createRoomComponentElement(type, rotation = 0) {
                 const component = createDraggableElement(`room-component ${type}`);
+                component.classList.add('p-1', 'border', 'border-gray-300', 'dark:border-gray-500', 'rounded-md');
+                component.dataset.itemType = 'component';
                 component.dataset.componentType = type;
                 let text = '';
                 switch(type) {
@@ -776,12 +901,63 @@
             function assignNames() {
                 const names = namesInput.value.trim().split('\n').filter(name => name.trim() !== '');
                 if (names.length === 0) return showMessage("Please enter some names to assign.");
-                for (let i = names.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [names[i], names[j]] = [names[j], names[i]]; }
-                const deskSlots = Array.from(canvasContainer.querySelectorAll('.desk-name'));
+
+                let currentDeskSlots = Array.from(canvasContainer.querySelectorAll('.desk-name'));
+                
+                if (names.length > currentDeskSlots.length) {
+                    const seatsNeeded = names.length - currentDeskSlots.length;
+                    showMessage(`Not enough seats. Adding ${seatsNeeded} new single desk(s)...`, false);
+
+                    const allItems = Array.from(canvasContainer.querySelectorAll('.draggable'));
+                    let lowestY = 0;
+                    if (allItems.length > 0) {
+                        lowestY = Math.max(...allItems.map(item => parseInt(item.style.top, 10) + item.offsetHeight));
+                    }
+                    let newTop = Math.ceil(lowestY / gridSize) * gridSize;
+                    if (allItems.length > 0) newTop += gridSize;
+                    let newLeft = gridSize;
+                    const canvasWidth = canvasContainer.offsetWidth;
+                    const deskWidth = 100;
+                    const deskHeight = 60;
+
+                    for (let i = 0; i < seatsNeeded; i++) {
+                        if (newLeft + deskWidth > canvasWidth - gridSize) {
+                            newLeft = gridSize;
+                            newTop += deskHeight + gridSize;
+                        }
+                        const newDesk = createDeskElement('single');
+                        addItemToCanvas(newDesk, `${newLeft}px`, `${newTop}px`);
+                        newLeft += deskWidth + gridSize;
+                    }
+                }
+                
+                for (let i = names.length - 1; i > 0; i--) { 
+                    const j = Math.floor(Math.random() * (i + 1)); 
+                    [names[i], names[j]] = [names[j], names[i]]; 
+                }
+                
+                const allDesks = Array.from(canvasContainer.querySelectorAll('.desk, .harkness-table'));
+                allDesks.sort((a, b) => {
+                    const topA = parseInt(a.style.top, 10);
+                    const topB = parseInt(b.style.top, 10);
+                    if (topA !== topB) {
+                        return topA - topB;
+                    }
+                    return parseInt(a.style.left, 10) - parseInt(b.style.left, 10);
+                });
+
+                const deskSlots = allDesks.flatMap(desk => Array.from(desk.querySelectorAll('.desk-name')));
+                
                 if (deskSlots.length === 0) return showMessage("There are no desks to assign names to.");
-                if (names.length > deskSlots.length) showMessage(`Warning: ${names.length} names, but only ${deskSlots.length} seats.`);
-                else showMessage(`Assigned ${Math.min(names.length, deskSlots.length)} names.`, false);
+                
+                if (names.length < deskSlots.length) {
+                    showMessage(`Assigned ${names.length} names to front seats.`, false);
+                } else {
+                    showMessage(`Assigned all ${names.length} names.`, false);
+                }
+
                 clearNames();
+                
                 deskSlots.forEach((slot, index) => {
                     if (index < names.length) {
                         slot.textContent = names[index];
@@ -792,11 +968,8 @@
             }
             
             function clearNames() {
-                canvasContainer.querySelectorAll('.desk-name').forEach((slot) => {
-                    const parentDesk = slot.closest('.desk');
-                    const slots = Array.from(parentDesk.querySelectorAll('.desk-name'));
-                    const index = slots.indexOf(slot);
-                    slot.textContent = `Seat ${index + 1}`;
+                canvasContainer.querySelectorAll('.desk-name').forEach((slot, i) => {
+                    slot.textContent = `Seat ${i + 1}`;
                     slot.classList.add('text-gray-500', 'dark:text-gray-300');
                     slot.classList.remove('text-gray-900', 'dark:text-white', 'font-medium');
                 });
@@ -816,9 +989,15 @@
                 const name = layoutNameInput.value.trim();
                 if (!name) return showMessage('Please enter a name for the layout.');
                 const layoutData = Array.from(canvasContainer.querySelectorAll('.draggable')).map(el => {
-                    const data = { left: el.style.left, top: el.style.top, rotation: el.dataset.rotation || 0 };
-                    if (el.classList.contains('desk')) { data.itemClass = 'desk'; data.deskType = el.dataset.deskType; } 
-                    else { data.itemClass = 'component'; data.componentType = el.dataset.componentType; }
+                    const data = { 
+                        left: el.style.left, 
+                        top: el.style.top, 
+                        rotation: el.dataset.rotation || 0,
+                        itemType: el.dataset.itemType
+                    };
+                    if (data.itemType === 'desk') { data.deskType = el.dataset.deskType; } 
+                    else if (data.itemType === 'harkness') { data.numSeats = el.dataset.numSeats; }
+                    else if (data.itemType === 'component') { data.componentType = el.dataset.componentType; }
                     return data;
                 });
                 const layouts = getLayouts();
@@ -840,8 +1019,13 @@
                 layoutData.forEach(itemInfo => {
                     let element;
                     const rotation = itemInfo.rotation || 0;
-                    if (itemInfo.itemClass === 'desk') element = createDeskElement(itemInfo.deskType, rotation);
-                    else if (itemInfo.itemClass === 'component') element = createRoomComponentElement(itemInfo.componentType, rotation);
+                    if (itemInfo.itemType === 'desk') {
+                        element = createDeskElement(itemInfo.deskType, rotation);
+                    } else if (itemInfo.itemType === 'harkness') {
+                        element = createHarknessTableElement(itemInfo.numSeats, rotation);
+                    } else if (itemInfo.itemType === 'component') {
+                        element = createRoomComponentElement(itemInfo.componentType, rotation);
+                    }
                     if (element) {
                         addItemToCanvas(element, itemInfo.left, itemInfo.top);
                     }
@@ -875,6 +1059,55 @@
                 reader.readAsText(file);
                 event.target.value = '';
             }
+            
+            // Canvas Resizing Logic
+            function startResize(e) {
+                e.preventDefault();
+                const startY = e.type === 'touchstart' ? e.touches[0].clientY : e.clientY;
+                const startHeight = parseInt(document.defaultView.getComputedStyle(canvasContainer).height, 10);
+
+                canvasContainer.style.minHeight = 'auto'; // Remove Tailwind constraint
+
+                function doResize(e) {
+                    const currentY = e.type === 'touchmove' ? e.touches[0].clientY : e.clientY;
+                    const newHeight = startHeight + currentY - startY;
+                    if (newHeight >= 300) { // Set a minimum height
+                        canvasContainer.style.height = `${newHeight}px`;
+                    }
+                }
+
+                function stopResize() {
+                    document.removeEventListener('mousemove', doResize);
+                    document.removeEventListener('mouseup', stopResize);
+                    document.removeEventListener('touchmove', doResize);
+                    document.removeEventListener('touchend', stopResize);
+                }
+
+                document.addEventListener('mousemove', doResize);
+                document.addEventListener('mouseup', stopResize);
+                document.addEventListener('touchmove', doResize, { passive: false });
+                document.addEventListener('touchend', stopResize);
+            }
+
+            // Harkness Modal Logic
+            function closeHarknessModal() {
+                harknessModal.classList.add('hidden');
+            }
+            
+            addHarknessBtn.addEventListener('click', () => harknessModal.classList.remove('hidden'));
+            closeHarknessModalBtn.addEventListener('click', closeHarknessModal);
+            cancelHarknessBtn.addEventListener('click', closeHarknessModal);
+            harknessModal.addEventListener('click', (e) => {
+                if (e.target === harknessModal) closeHarknessModal();
+            });
+            confirmAddHarknessBtn.addEventListener('click', () => {
+                const numSeats = parseInt(harknessSeatsInputModal.value, 10);
+                if (isNaN(numSeats) || numSeats < 4 || numSeats > 20) {
+                    return showMessage("Please enter a number of seats between 4 and 20.");
+                }
+                addItemToCanvas(createHarknessTableElement(numSeats));
+                closeHarknessModal();
+            });
 
             singleDeskBtn.addEventListener('click', () => addItemToCanvas(createDeskElement('single')));
             doubleDeskBtn.addEventListener('click', () => addItemToCanvas(createDeskElement('double')));
@@ -886,6 +1119,8 @@
             saveLayoutBtn.addEventListener('click', saveCurrentLayout);
             loadLayoutBtn.addEventListener('click', loadSelectedLayout);
             deleteLayoutBtn.addEventListener('click', deleteSelectedLayout);
+            resizeHandle.addEventListener('mousedown', startResize);
+            resizeHandle.addEventListener('touchstart', startResize, { passive: false });
             
             // Initial population
             populateLayoutsDropdown();
@@ -896,6 +1131,7 @@
             const groupNamesInput = document.getElementById('groupNames');
             const groupCsvFileInput = document.getElementById('groupCsvFileInput');
             const numGroupsInput = document.getElementById('numGroups');
+            const numSetsInput = document.getElementById('numSets');
             const generateGroupsBtn = document.getElementById('generateGroupsBtn');
             const groupsResultContainer = document.getElementById('groupsResultContainer');
             const messageBox = document.getElementById('group-generator-message-box');
@@ -924,48 +1160,85 @@
             function generateGroups() {
                 const names = groupNamesInput.value.trim().split('\n').filter(name => name.trim() !== '');
                 const numGroups = parseInt(numGroupsInput.value, 10);
+                const numSets = parseInt(numSetsInput.value, 10);
 
                 if (names.length === 0) return showMessage('Please enter student names.');
                 if (isNaN(numGroups) || numGroups <= 0) return showMessage('Please enter a valid number of groups.');
+                if (isNaN(numSets) || numSets <= 0) return showMessage('Please enter a valid number of sets.');
                 if (numGroups > names.length) return showMessage('Number of groups cannot exceed the number of students.');
 
-                // Shuffle names
-                for (let i = names.length - 1; i > 0; i--) {
-                    const j = Math.floor(Math.random() * (i + 1));
-                    [names[i], names[j]] = [names[j], names[i]];
-                }
-
-                // Create group buckets
-                const groups = Array.from({ length: numGroups }, () => []);
-                
-                // Distribute names
-                names.forEach((name, index) => {
-                    groups[index % numGroups].push(name);
-                });
-
-                // Display groups
                 groupsResultContainer.innerHTML = '';
-                groups.forEach((group, index) => {
-                    const groupCard = document.createElement('div');
-                    groupCard.className = 'bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-4 shadow';
-                    
-                    const title = document.createElement('h3');
-                    title.className = 'font-bold text-lg mb-2 text-red-700 dark:text-red-500';
-                    title.textContent = `Group ${index + 1}`;
-                    groupCard.appendChild(title);
+                const generatedSets = new Set();
+                const maxTries = 1000;
 
-                    const list = document.createElement('ul');
-                    list.className = 'space-y-1';
-                    group.forEach(name => {
-                        const listItem = document.createElement('li');
-                        listItem.className = 'text-gray-700 dark:text-gray-300';
-                        listItem.textContent = name;
-                        list.appendChild(listItem);
+                for (let i = 0; i < numSets; i++) {
+                    let uniqueSetFound = false;
+                    let tries = 0;
+                    let currentGroups;
+
+                    while (!uniqueSetFound && tries < maxTries) {
+                        tries++;
+                        let shuffledNames = [...names];
+                        for (let j = shuffledNames.length - 1; j > 0; j--) {
+                            const k = Math.floor(Math.random() * (j + 1));
+                            [shuffledNames[j], shuffledNames[k]] = [shuffledNames[k], shuffledNames[j]];
+                        }
+
+                        currentGroups = Array.from({ length: numGroups }, () => []);
+                        shuffledNames.forEach((name, index) => {
+                            currentGroups[index % numGroups].push(name);
+                        });
+
+                        const sortedGroups = currentGroups.map(g => g.sort()).sort((a, b) => a.join(',').localeCompare(b.join(',')));
+                        const canonicalString = sortedGroups.map(g => g.join(',')).join('|');
+
+                        if (!generatedSets.has(canonicalString)) {
+                            uniqueSetFound = true;
+                            generatedSets.add(canonicalString);
+                        }
+                    }
+
+                    if (!uniqueSetFound) {
+                        showMessage(`Could not generate a unique set ${i + 1} after ${maxTries} tries. Halting.`, true);
+                        break;
+                    }
+
+                    const setContainer = document.createElement('div');
+                    setContainer.className = 'col-span-full border-b-2 border-gray-300 dark:border-gray-600 pb-6';
+                    
+                    const setTitle = document.createElement('h2');
+                    setTitle.className = 'text-2xl font-bold mb-4 text-center';
+                    setTitle.textContent = `Set ${i + 1}`;
+                    setContainer.appendChild(setTitle);
+                    
+                    const groupGrid = document.createElement('div');
+                    groupGrid.className = 'grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4';
+
+                    currentGroups.forEach((group, index) => {
+                        const groupCard = document.createElement('div');
+                        groupCard.className = 'bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-4 shadow';
+                        const title = document.createElement('h3');
+                        title.className = 'font-bold text-lg mb-2 text-red-700 dark:text-red-500';
+                        title.textContent = `Group ${index + 1}`;
+                        groupCard.appendChild(title);
+                        const list = document.createElement('ul');
+                        list.className = 'space-y-1';
+                        group.forEach(name => {
+                            const listItem = document.createElement('li');
+                            listItem.className = 'text-gray-700 dark:text-gray-300';
+                            listItem.textContent = name;
+                            list.appendChild(listItem);
+                        });
+                        groupCard.appendChild(list);
+                        groupGrid.appendChild(groupCard);
                     });
-                    groupCard.appendChild(list);
-                    groupsResultContainer.appendChild(groupCard);
-                });
-                showMessage(`Successfully created ${numGroups} groups.`, false);
+                    setContainer.appendChild(groupGrid);
+                    groupsResultContainer.appendChild(setContainer);
+                }
+                
+                if (generatedSets.size > 0) {
+                  showMessage(`Successfully generated ${generatedSets.size} unique set(s).`, false);
+                }
             }
 
             generateGroupsBtn.addEventListener('click', generateGroups);
@@ -1019,7 +1292,7 @@
 
             function extractVideoID(url) {
                 const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
-                const match = url.match(regExp);
+                const match = url.match(RegExp);
                 return (match && match[2].length === 11) ? match[2] : null;
             }
 
