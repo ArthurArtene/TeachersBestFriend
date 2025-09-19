@@ -1344,7 +1344,8 @@
                 clearInterval(timerInterval);
                 isTimerRunning = false;
                 startPauseBtn.textContent = 'Start';
-                const minutes = parseInt(timerMinutesInput.value);
+                const minutes = parseInt(timerMinutesInput.value,10);
+                console.log(minutes);
                 if (isNaN(minutes) || minutes <= 0) {
                     timeRemaining = 0;
                     totalTime = 0;
@@ -1449,5 +1450,6 @@
     </script>
 </body>
 </html>
+
 
 
