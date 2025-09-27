@@ -1345,16 +1345,16 @@
                 isTimerRunning = false;
                 startPauseBtn.textContent = 'Start';
                 //const minutes = parseInt(timerMinutesInput.value,10);
-                const time = timerMinutesInput.value.split(":");
+                const time = timerMinutesInput.split(":");
                 const minutes = parseInt(time[0].value,10);
                 const seconds = parseInt(time[1].value,10);
-                console.log(minutes);
-                console.log(seconds);
+                console.log(time[0]);
+                console.log(time[1]);
                 if (isNaN(minutes) || minutes <= 0) {
                     timeRemaining = 0;
                     totalTime = 0;
                 } else {
-                    timeRemaining = minutes * 60;
+                    timeRemaining = minutes * 60 + seconds;
                     totalTime = minutes * 60;
                 }
                 updateTimerDisplays(timeRemaining);
@@ -1454,6 +1454,7 @@
     </script>
 </body>
 </html>
+
 
 
 
