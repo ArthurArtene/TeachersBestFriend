@@ -1346,7 +1346,7 @@
                 startPauseBtn.textContent = 'Start';
                 //const minutes = parseInt(timerMinutesInput.value,10);
                 const time = String(timerMinutesInput).split(":");
-                //const minutes = parseInt(time[0].value,10);
+                const minutes = parseInt(time[0].value,10);
                 //const seconds = parseInt(time[1].value,10);
                 console.log(time[0]);
                 console.log(time[1]);
@@ -1354,7 +1354,7 @@
                     timeRemaining = 0;
                     totalTime = 0;
                 } else {
-                    timeRemaining = minutes * 60 + seconds;
+                    timeRemaining = minutes * 60;
                     totalTime = minutes * 60;
                 }
                 updateTimerDisplays(timeRemaining);
@@ -1454,6 +1454,7 @@
     </script>
 </body>
 </html>
+
 
 
 
