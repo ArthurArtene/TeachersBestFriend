@@ -1258,7 +1258,7 @@
 
 
             // Timer elements
-            const timerMinutesInput = document.getElementById('timer-minutes');
+            const timerMinutesInput = document.getElementById('timer-minutes').value;
             const setTimerBtn = document.getElementById('set-timer-btn');
             const startPauseBtn = document.getElementById('start-pause-timer-btn');
             const resetTimerBtn = document.getElementById('reset-timer-btn');
@@ -1345,11 +1345,11 @@
                 isTimerRunning = false;
                 startPauseBtn.textContent = 'Start';
                 //const minutes = parseInt(timerMinutesInput.value,10);
-                const time = String(timerMinutesInput).split(":");
+                const time = timerMinutesInput.split(':');
                 const minutes = parseInt(time[0].value,10);
-                //const seconds = parseInt(time[1].value,10);
-                console.log(time[0]);
-                console.log(time[1]);
+                const seconds = parseInt(time[1].value,10);
+                console.log(minutes);
+                console.log(seconds);
                 if (isNaN(minutes) || minutes <= 0) {
                     timeRemaining = 0;
                     totalTime = 0;
@@ -1454,6 +1454,7 @@
     </script>
 </body>
 </html>
+
 
 
 
