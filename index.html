@@ -1346,8 +1346,8 @@
                 startPauseBtn.textContent = 'Start';
                 //const minutes = parseInt(timerMinutesInput.value,10);
                 const time = timerMinutesInput.split(':');
-                const minutes = parseInt(time[0].value,10);
-                const seconds = parseInt(time[1].value,10);
+                const minutes = parseInt(time[0],10);
+                const seconds = parseInt(time[1],10);
                 console.log(minutes);
                 console.log(seconds);
                 if (isNaN(minutes) || minutes <= 0) {
@@ -1454,6 +1454,7 @@
     </script>
 </body>
 </html>
+
 
 
 
