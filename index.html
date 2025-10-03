@@ -379,7 +379,7 @@
                              <button id="toggle-video-btn" class="hidden bg-gray-600 text-white font-semibold py-2 px-4 rounded-md transition hover:bg-gray-700 mt-2">Hide Video</button>
                         </div>
                         <div id="youtube-player-container" class="w-full aspect-video hidden">
-                            <div id="youtube-player"></div>
+                            <div id="youtube-player" style="align-items: center;"><iframe id="contentFrame" title="Loaded Content" width="98%" height="280px"></iframe></div>
                         </div>
                          <div class="w-full text-center border-t border-gray-200 dark:border-gray-600 pt-6">
                              <h2 class="text-xl font-semibold mb-2">Current Time</h2>
@@ -1292,36 +1292,37 @@
                 // This function is called automatically when the YouTube IFrame Player API code downloads.
             };
 
-            function extractVideoID(url) {
-                const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
-                const match = url.match(RegExp);
-                return (match && match[2].length === 11) ? match[2] : null;
+            function convertToEmbedUrl(url) {
+                let videoId = null;
+
+        // Regular expression to find the YouTube video ID from various URL formats
+                const youtubeRegex = /(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/(?:watch\?v=|embed\/)|youtu\.be\/)([a-zA-Z0-9_-]{11})/;
+
+                const match = url.match(youtubeRegex);
+                if (match && match[1]) {
+                    videoId = match[1];
+                    return `https://www.youtube.com/embed/${videoId}`;
+                }
+
+        // If it's not a YouTube URL, return the original URL
+        return url;
+    }
+            function createEmbedUrl(videoId) {
+                return `https://www.youtube.com/embed/${videoId}?enablejsapi=1&rel=0`;
             }
 
             function loadVideo() {
-                const videoUrl = youtubeUrlInput.value.trim();
+                const videoUrl = youtubeUrlInput.value;
                 if (!videoUrl) return;
-                const videoId = extractVideoID(videoUrl);
 
-                if (!videoId) {
-                    alert("Please enter a valid YouTube video URL.");
-                    return;
-                }
+                const embedUrl = createEmbedUrl(videoUrl);
                 
                 youtubePlayerContainer.classList.remove('hidden', 'video-hidden');
                 toggleVideoBtn.classList.remove('hidden');
                 toggleVideoBtn.textContent = 'Hide Video';
-
-                if (ytPlayer) {
-                    ytPlayer.loadVideoById(videoId);
-                } else {
-                    ytPlayer = new YT.Player('youtube-player', {
-                        height: '100%',
-                        width: '100%',
-                        videoId: videoId,
-                        playerVars: { 'playsinline': 1, 'controls': 1 }
-                    });
-                }
+                if (videoUrl) {
+                    contentFrame.src = convertToEmbedUrl(videoUrl);
+            }
             }
 
             // Clock Logic
